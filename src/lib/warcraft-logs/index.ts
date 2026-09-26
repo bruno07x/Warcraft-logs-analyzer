@@ -1,0 +1,1 @@
+export { fetchLog } from "./report";

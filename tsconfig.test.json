@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": ".test-dist",
+    "rootDir": "."
+  },
+  "include": ["src/lib/analysis/compare-casts.ts", "src/lib/analysis/observations.ts", "src/types/analysis.ts", "tests/**/*.ts"]
+}
