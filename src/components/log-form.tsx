@@ -2,15 +2,15 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition, type ChangeEvent, type FormEvent } from "react";
-import { EXAMPLE_LOG_URL, LOG_FIELDS, serializeLogInputs } from "@/lib/validation/analysis-input";
+import { EXAMPLE_LOG_URL, LOG_FIELD, serializeLogInputs } from "@/lib/validation/analysis-input";
 import { parseLogUrl } from "@/lib/validation/log-url";
-import type { LogInputs, LogSlot } from "@/types/analysis";
+import type { LogSlot } from "@/types/analysis";
 
 /**
  * Exibe erros junto aos três campos e navega apenas quando todos forem válidos.
  * O formulário GET também permite a validação no servidor sem JavaScript.
  */
-export function LogForm({ initialInputs }: { initialInputs: LogInputs }) {
+export function LogForm({ initialInput }: { initialInput: string }) {
   const router = useRouter();
   const [errors, setErrors] = useState<Partial<Record<LogSlot, string>>>({});
   const [isPending, startTransition] = useTransition();
@@ -28,18 +28,11 @@ export function LogForm({ initialInputs }: { initialInputs: LogInputs }) {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
-    const inputs: LogInputs = { player: "", referenceOne: "", referenceTwo: "" };
+    const input = String(data.get("player") ?? "");
     const nextErrors: Partial<Record<LogSlot, string>> = {};
     let firstInvalid: LogSlot | undefined;
 
-    for (const { slot } of LOG_FIELDS) {
-      inputs[slot] = String(data.get(slot) ?? "");
-      const result = parseLogUrl(inputs[slot]);
-      if (!result.ok) {
-        nextErrors[slot] = result.error.message;
-        firstInvalid ??= slot;
-      }
-    }
+    const result = parseLogUrl(input); if (!result.ok) { nextErrors.player = result.error.message; firstInvalid = "player"; }
 
     setErrors(nextErrors);
     if (firstInvalid) {
@@ -50,13 +43,13 @@ export function LogForm({ initialInputs }: { initialInputs: LogInputs }) {
 
     /** Mantém o botão em estado de espera até a nova página estar disponível. */
     function navigateToAnalysis() {
-      router.push(`/analysis?${serializeLogInputs(inputs)}`);
+      router.push(`/analysis?${serializeLogInputs(input)}`);
     }
     startTransition(navigateToAnalysis);
   }
 
   /** Associa exemplo e erro ao campo, mantendo labels consistentes entre as páginas. */
-  function renderField({ slot, label, description }: (typeof LOG_FIELDS)[number], index: number) {
+  function renderField({ slot, label, description }: typeof LOG_FIELD, index: number) {
     const error = errors[slot];
     return (
       <div className="log-field" key={slot}>
@@ -67,7 +60,7 @@ export function LogForm({ initialInputs }: { initialInputs: LogInputs }) {
           name={slot}
           type="url"
           required
-          defaultValue={initialInputs[slot]}
+          defaultValue={initialInput}
           placeholder="https://www.warcraftlogs.com/reports/…"
           autoComplete="off"
           autoCapitalize="none"
@@ -85,11 +78,11 @@ export function LogForm({ initialInputs }: { initialInputs: LogInputs }) {
 
   return (
     <form action="/analysis" method="get" onSubmit={handleSubmit} noValidate aria-busy={isPending}>
-      {LOG_FIELDS.map(renderField)}
+      {renderField(LOG_FIELD, 0)}
       <div className="form-actions">
         <p>Os links ficam no endereço da página para você poder voltar e compartilhá-los.</p>
         <button type="submit" disabled={isPending}>
-          {isPending ? "Validando…" : "Validar URLs"}<span aria-hidden="true"> →</span>
+          {isPending ? "Buscando…" : "Encontrar referências"}<span aria-hidden="true"> →</span>
         </button>
       </div>
       <p className="sr-only" role="status">

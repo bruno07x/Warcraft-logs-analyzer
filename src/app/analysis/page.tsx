@@ -1,13 +1,11 @@
 import Link from "next/link";
 import { AnalysisResults } from "@/components/analysis-results";
 import { analyzeLogs } from "@/lib/analysis/analyze-logs";
-import { LOG_FIELDS, readLogInputs, serializeLogInputs, validateAnalysisInput } from "@/lib/validation/analysis-input";
+import { readLogInputs, serializeLogInputs, validateAnalysisInput } from "@/lib/validation/analysis-input";
 import type { AnalysisSearchParams, LogSlot } from "@/types/analysis";
 
 /** Recupera o rótulo apresentado ao usuário para um slot de log. */
-function labelForSlot(slot: LogSlot | undefined): string {
-  return LOG_FIELDS.find((field) => field.slot === slot)?.label ?? "Análise";
-}
+function labelForSlot(slot: LogSlot | undefined): string { return slot === "player" ? "Seu log" : "Análise"; }
 
 /** Exibe uma falha esperada, preservando os valores para correção no formulário. */
 function AnalysisFailure({ label, message, returnHref }: { label: string; message: string; returnHref: string }) {

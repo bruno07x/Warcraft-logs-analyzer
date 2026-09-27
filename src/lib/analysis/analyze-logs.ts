@@ -4,8 +4,7 @@ import { fetchLog } from "@/lib/warcraft-logs";
 import { compareCasts } from "./compare-casts";
 import { countCasts } from "./count-casts";
 import { createObservations } from "./observations";
-
-const slots: LogSlot[] = ["player", "referenceOne", "referenceTwo"];
+import { findReferences } from "./reference-selection";
 
 /** Fornece o nome do campo na mesma linguagem usada pela interface. */
 function slotLabel(slot: LogSlot): string {
@@ -35,51 +34,14 @@ async function fetchSlot(slot: LogSlot, reference: LogReference): Promise<Result
 }
 
 /**
- * Confirma que as três lutas pertencem ao mesmo encontro de chefe válido.
- * Classe, especialização, dificuldade e resultado são preservados como contexto e não bloqueiam a análise.
- */
-function validateEncounter(logs: Record<LogSlot, FetchedLog>): Result<true> {
-  const playerEncounterID = logs.player.metadata.encounterID;
-  if (!Number.isSafeInteger(playerEncounterID) || playerEncounterID <= 0) {
-    return { ok: false, error: { code: "invalid_encounter", slot: "player", message: "Seu log não contém um encontro de chefe válido para comparação." } };
-  }
-
-  for (const slot of ["referenceOne", "referenceTwo"] as const) {
-    const encounterID = logs[slot].metadata.encounterID;
-    if (!Number.isSafeInteger(encounterID) || encounterID <= 0 || encounterID !== playerEncounterID) {
-      return {
-        ok: false,
-        error: {
-          code: "different_encounter",
-          slot,
-          message: `${slotLabel(slot)} não pertence ao mesmo encontro do seu log.`,
-        },
-      };
-    }
-  }
-  return { ok: true, value: true };
-}
-
-/**
  * Consulta, valida e compara três logs somente quando todos estiverem disponíveis.
  * Uma falha ou encontro incompatível retorna erro sem qualquer resultado parcial.
  */
-export async function analyzeLogs(
-  references: Record<LogSlot, LogReference>,
-): Promise<Result<AnalysisResult>> {
-  const results = await Promise.all(slots.map((slot) => fetchSlot(slot, references[slot])));
-  const [playerResult, referenceOneResult, referenceTwoResult] = results;
+export async function analyzeLogs(playerReference: LogReference): Promise<Result<AnalysisResult>> {
+  const playerResult = await fetchSlot("player", playerReference);
   if (!playerResult.ok) return playerResult;
-  if (!referenceOneResult.ok) return referenceOneResult;
-  if (!referenceTwoResult.ok) return referenceTwoResult;
-
-  const logs: Record<LogSlot, FetchedLog> = {
-    player: playerResult.value,
-    referenceOne: referenceOneResult.value,
-    referenceTwo: referenceTwoResult.value,
-  };
-  const encounter = validateEncounter(logs);
-  if (!encounter.ok) return encounter;
+  const references = await findReferences(playerResult.value); if (!references.ok) return references;
+  const logs = { player: playerResult.value, referenceOne: references.value.referenceOne.log, referenceTwo: references.value.referenceTwo.log };
 
   const playerCasts = countCasts(logs.player.casts, logs.player.metadata.sourceID, logs.player.abilityNames);
   const referenceOneCasts = countCasts(logs.referenceOne.casts, logs.referenceOne.metadata.sourceID, logs.referenceOne.abilityNames);
@@ -94,6 +56,7 @@ export async function analyzeLogs(
         referenceOne: logs.referenceOne.metadata,
         referenceTwo: logs.referenceTwo.metadata,
       },
+      referencePercentiles: { referenceOne: references.value.referenceOne.percentile, referenceTwo: references.value.referenceTwo.percentile },
       comparisons,
       observations: createObservations(comparisons),
     },

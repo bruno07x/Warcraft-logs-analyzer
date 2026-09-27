@@ -87,6 +87,16 @@ export function decodeReportMetadata(value: unknown, reference: LogReference): M
   if (actor.type !== "Player" || actor.petOwner !== null) {
     throw new WarcraftLogsError("not_found", "O identificador selecionado não pertence a um personagem jogador.");
   }
+  const playerDetails = record(report.playerDetails);
+  const detail = Object.values(playerDetails)
+    .flatMap((group) => Array.isArray(group) ? group : [])
+    .map(record)
+    .find((candidate) => candidate.id === reference.sourceID);
+  if (detail === undefined) invalidResponse();
+  const minItemLevel = finiteNumber(detail.minItemLevel);
+  const maxItemLevel = finiteNumber(detail.maxItemLevel);
+  if (minItemLevel <= 0 || maxItemLevel <= 0 || maxItemLevel < minItemLevel) invalidResponse();
+  const itemLevel = (minItemLevel + maxItemLevel) / 2;
 
   const abilityNames: Record<number, string> = {};
   for (const abilityValue of masterData.abilities) {
@@ -124,6 +134,7 @@ export function decodeReportMetadata(value: unknown, reference: LogReference): M
       specialization,
       difficulty,
       kill: killValue ?? undefined,
+      itemLevel,
       durationMs: endTime - startTime,
     },
     startTime,

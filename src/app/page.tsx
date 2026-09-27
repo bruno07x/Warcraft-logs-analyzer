@@ -19,7 +19,7 @@ export default async function HomePage({
         <p className="eyebrow">CADA CAST CONTA</p>
         <h1 id="home-title">Um novo olhar<br />sobre seus <span>logs.</span></h1>
         <p className="intro-copy">
-          Reúna seu log e duas referências do mesmo encontro para preparar sua comparação de habilidades.
+          Informe seu log; encontraremos duas referências do mesmo encontro para comparar suas habilidades.
         </p>
       </section>
       <div className="entry-grid">
@@ -27,11 +27,11 @@ export default async function HomePage({
           <div className="panel-heading">
             <span className="step-marker" aria-hidden="true">01</span>
             <div>
-              <h2 id="form-title">Comece pelos três logs</h2>
-              <p>Selecione a luta e o personagem antes de copiar cada URL.</p>
+              <h2 id="form-title">Comece pelo seu log</h2>
+              <p>Selecione a luta e o personagem; as referências serão encontradas automaticamente.</p>
             </div>
           </div>
-          <LogForm key={serializeLogInputs(inputs)} initialInputs={inputs} />
+          <LogForm key={serializeLogInputs(inputs)} initialInput={inputs} />
         </section>
         <aside className="guide" aria-labelledby="guide-title">
           <p className="eyebrow">ANTES DE COMEÇAR</p>

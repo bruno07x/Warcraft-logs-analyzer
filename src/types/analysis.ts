@@ -8,7 +8,7 @@ export type LogReference = {
 /** Posição de cada log na comparação; também nomeia os query parameters. */
 export type LogSlot = "player" | "referenceOne" | "referenceTwo";
 
-export type LogInputs = Record<LogSlot, string>;
+export type LogInputs = { player: string };
 
 /** Formato fornecido pelo App Router, incluindo parâmetros repetidos. */
 export type AnalysisSearchParams = Record<string, string | string[] | undefined>;
@@ -44,6 +44,7 @@ export type LogMetadata = {
   specialization?: string;
   difficulty?: string;
   kill?: boolean;
+  itemLevel: number;
   durationMs: number;
 };
 
@@ -82,6 +83,7 @@ export type Observation = {
 /** Resultado pronto para a futura página de análise, sem detalhes do transporte. */
 export type AnalysisResult = {
   logs: Record<LogSlot, LogMetadata>;
+  referencePercentiles: Pick<Record<LogSlot, number>, "referenceOne" | "referenceTwo">;
   comparisons: AbilityComparison[];
   observations: Observation[];
 };
