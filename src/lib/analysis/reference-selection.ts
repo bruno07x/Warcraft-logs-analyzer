@@ -10,10 +10,13 @@ const sameItemLevel = (left: number, right: number) => Math.abs(left - right) <=
 export async function findReferences(player: FetchedLog): Promise<Result<{ referenceOne: SelectedReference; referenceTwo: SelectedReference }>> {
   const metadata = player.metadata;
   if (!metadata.kill || !metadata.specialization || !metadata.className || !metadata.difficulty || !Number.isSafeInteger(metadata.encounterID) || metadata.encounterID <= 0) return { ok: false, error: { code: "no_matching_references", message: "Seu log não contém os metadados necessários para encontrar referências compatíveis." } };
-  const candidatesResult = await fetchRankingCandidates({ encounterID: metadata.encounterID, difficulty: Number(metadata.difficulty), className: metadata.className, specialization: metadata.specialization }, 1);
-  if (!candidatesResult.ok) return candidatesResult;
   const eligible: SelectedReference[] = []; const seen = new Set<string>();
-  for (const candidate of candidatesResult.value) {
+  let page = 1; let hasMorePages = true;
+  while (hasMorePages && eligible.filter((entry) => entry.percentile >= 97).length < 2) {
+    const candidatesResult = await fetchRankingCandidates({ encounterID: metadata.encounterID, difficulty: Number(metadata.difficulty), className: metadata.className, specialization: metadata.specialization }, page);
+    if (!candidatesResult.ok) return candidatesResult;
+    hasMorePages = candidatesResult.value.hasMorePages; page += 1;
+    for (const candidate of candidatesResult.value.candidates) {
       const key = `${candidate.reportCode}:${candidate.fightID}:${candidate.characterName}`;
       if (seen.has(key) || candidate.className !== metadata.className || candidate.specialization !== metadata.specialization || Math.abs(candidate.durationMs - metadata.durationMs) > 30_000) continue;
       seen.add(key);
@@ -24,6 +27,8 @@ export async function findReferences(player: FetchedLog): Promise<Result<{ refer
       if (!candidateMetadata.kill || candidateMetadata.encounterID !== metadata.encounterID || candidateMetadata.difficulty !== metadata.difficulty || candidateMetadata.specialization !== metadata.specialization || candidateMetadata.className !== metadata.className || !sameItemLevel(candidateMetadata.itemLevel, metadata.itemLevel) || Math.abs(candidateMetadata.durationMs - metadata.durationMs) > 30_000) continue;
       const percentile = await fetchRankingPercentile(resolved.value, candidate.characterName, candidate.className, candidate.specialization); if (!percentile.ok) continue;
       eligible.push({ log: log.value, percentile: percentile.value });
+      if (eligible.filter((entry) => entry.percentile >= 97).length >= 2) break;
+    }
   }
   const selected: SelectedReference[] = [];
   for (let minimum = 97; minimum >= 0 && selected.length < 2; minimum -= 1) {

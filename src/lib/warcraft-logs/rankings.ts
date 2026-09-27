@@ -5,23 +5,26 @@ import { asWarcraftLogsError, WarcraftLogsError } from "./errors";
 import { RANKING_CANDIDATES_QUERY, REPORT_ACTORS_QUERY, REPORT_RANKINGS_QUERY } from "./queries";
 
 export type RankingCandidate = { reportCode: string; fightID: number; characterName: string; className: string; specialization: string; durationMs: number };
+export type RankingPage = { candidates: RankingCandidate[]; hasMorePages: boolean };
 const bad = () => { throw new WarcraftLogsError("invalid_response", "O Warcraft Logs retornou uma resposta inesperada."); };
 const object = (value: unknown): Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value) ? value as Record<string, unknown> : bad();
 const number = (value: unknown): number => typeof value === "number" && Number.isFinite(value) ? value : bad();
 const integer = (value: unknown): number => Number.isSafeInteger(number(value)) ? number(value) : bad();
 const text = (value: unknown): string => typeof value === "string" && value.trim() ? value : bad();
 const list = (value: unknown): unknown[] => Array.isArray(value) ? value : bad();
+const boolean = (value: unknown): boolean => typeof value === "boolean" ? value : bad();
 
 /** Busca uma página de candidatos ordenados pelo ranking público da especialização. */
-export async function fetchRankingCandidates(criteria: { encounterID: number; difficulty: number; className: string; specialization: string }, page: number): Promise<Result<RankingCandidate[]>> {
+export async function fetchRankingCandidates(criteria: { encounterID: number; difficulty: number; className: string; specialization: string }, page: number): Promise<Result<RankingPage>> {
   try {
     const candidates = await queryWarcraftLogs(RANKING_CANDIDATES_QUERY, { ...criteria, specName: criteria.specialization, page }, (value) => {
       const encounter = object(object(value).worldData).encounter;
       const ranked = object(object(encounter).characterRankings);
-      return list(ranked.rankings).map((entry): RankingCandidate => {
+      const candidates = list(ranked.rankings).map((entry): RankingCandidate => {
         const row = object(entry); const report = object(row.report);
         return { reportCode: text(report.code), fightID: integer(report.fightID), characterName: text(row.name), className: text(row.class), specialization: text(row.spec), durationMs: number(row.duration) };
       });
+      return { candidates, hasMorePages: boolean(ranked.hasMorePages) };
     });
     return { ok: true, value: candidates };
   } catch (error) { const known = asWarcraftLogsError(error); return { ok: false, error: { code: known.code, message: "Não foi possível consultar os rankings do Warcraft Logs." } }; }
