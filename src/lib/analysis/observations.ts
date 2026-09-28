@@ -26,6 +26,7 @@ function createObservation(comparison: AbilityComparison): Observation {
     && comparison.referenceTwoCasts >= MINIMUM_REFERENCE_CASTS
   ) {
     return {
+      comparisonKey: comparison.comparisonKey,
       abilityID: comparison.abilityID,
       severity: "critical",
       message: `Você não utilizou “${comparison.abilityName}”; as referências utilizaram essa habilidade.`,
@@ -35,6 +36,7 @@ function createObservation(comparison: AbilityComparison): Observation {
   if (comparison.difference < 0) {
     const difference = Math.abs(comparison.difference);
     return {
+      comparisonKey: comparison.comparisonKey,
       abilityID: comparison.abilityID,
       severity: "warning",
       message: `Você utilizou “${comparison.abilityName}” ${formatDifference(difference)} ${timesLabel(difference)} menos que a média das referências.`,
@@ -43,6 +45,7 @@ function createObservation(comparison: AbilityComparison): Observation {
 
   if (comparison.difference > 0) {
     return {
+      comparisonKey: comparison.comparisonKey,
       abilityID: comparison.abilityID,
       severity: "positive",
       message: `Você utilizou “${comparison.abilityName}” ${formatDifference(comparison.difference)} ${timesLabel(comparison.difference)} mais que a média das referências.`,
@@ -50,6 +53,7 @@ function createObservation(comparison: AbilityComparison): Observation {
   }
 
   return {
+    comparisonKey: comparison.comparisonKey,
     abilityID: comparison.abilityID,
     severity: "neutral",
     message: `Você igualou a média das referências em “${comparison.abilityName}”.`,
@@ -65,6 +69,6 @@ export function createObservations(comparisons: AbilityComparison[]): Observatio
     .map(createObservation)
     .sort((left, right) => {
       const severityDifference = severityOrder[left.severity] - severityOrder[right.severity];
-      return severityDifference || left.abilityID - right.abilityID;
+      return severityDifference || (left.comparisonKey ?? `${left.abilityID}:total`).localeCompare(right.comparisonKey ?? `${right.abilityID}:total`);
     });
 }

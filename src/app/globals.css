@@ -82,6 +82,12 @@ dd { margin: 0; overflow-wrap: anywhere; }
 .summary-label, .result-count { color: var(--accent); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
 .summary-code, .summary-details { color: var(--muted); font-size: 0.82rem; margin-top: 10px; overflow-wrap: anywhere; }
 .summary-details { color: #c8d0ce; }
+.combat-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px 14px; margin-top: 16px; }
+.combat-stats div { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 3px; }
+.combat-stats dt, .combat-stats dd { margin: 0; font-size: 0.76rem; }
+.combat-stats dt { color: var(--muted); }
+.combat-stats dd { color: var(--text); font-variant-numeric: tabular-nums; }
+.report-link { display: inline-block; margin-top: 18px; color: var(--accent); font-size: 0.82rem; font-weight: 700; }
 .observation-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 0; margin: 0; list-style: none; }
 .observation { display: grid; gap: 7px; border-left: 3px solid var(--border); padding: 15px 16px; background: var(--surface); border-radius: 0 8px 8px 0; font-size: 0.9rem; }
 .observation strong { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }

@@ -11,10 +11,12 @@ export const REPORT_METADATA_QUERY = `
           startTime
           endTime
           difficulty
+          keystoneLevel
           kill
           friendlyPlayers
           friendlySpecs
         }
+        playerDetails(fightIDs: $fightIDs, includeCombatantInfo: true)
         masterData(translate: true) {
           actors { id name type subType petOwner }
           abilities { gameID name }
@@ -50,5 +52,28 @@ export const REPORT_CASTS_QUERY = `
         }
       }
     }
+  }
+`;
+
+export const RANKING_CANDIDATES_QUERY = `
+  query RankingCandidates($encounterID: Int!, $difficulty: Int!, $bracket: Int!, $metric: CharacterRankingMetricType!, $className: String!, $specName: String!, $page: Int!) {
+    worldData { encounter(id: $encounterID) {
+      characterRankings(difficulty: $difficulty, bracket: $bracket, metric: $metric, className: $className, specName: $specName, page: $page)
+    }}
+  }
+`;
+
+export const REPORT_ACTORS_QUERY = `
+  query ReportActors($code: String!, $fightIDs: [Int!]) {
+    reportData { report(code: $code, allowUnlisted: false) {
+      fights(fightIDs: $fightIDs) { id friendlyPlayers }
+      masterData { actors { id name type subType petOwner } }
+    }}
+  }
+`;
+
+export const REPORT_RANKINGS_QUERY = `
+  query ReportRankings($code: String!, $fightIDs: [Int!], $playerMetric: ReportRankingMetricType!) {
+    reportData { report(code: $code, allowUnlisted: false) { rankings(fightIDs: $fightIDs, playerMetric: $playerMetric) } }
   }
 `;

@@ -66,6 +66,7 @@ export async function fetchLog(reference: LogReference): Promise<Result<FetchedL
         metadata: metadataPayload.metadata,
         casts,
         abilityNames: metadataPayload.abilityNames,
+        friendlyActorIDs: metadataPayload.friendlyActorIDs,
       },
     };
   } catch (error) {
