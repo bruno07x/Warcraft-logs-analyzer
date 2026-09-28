@@ -2,9 +2,9 @@ import type { AbilityComparison, CastCount } from "@/types/analysis";
 
 export const MINIMUM_REFERENCE_CASTS = 5;
 
-/** Transforma uma lista de contagens em busca por identificador de habilidade. */
-function indexByAbility(counts: CastCount[]): Map<number, CastCount> {
-  return new Map(counts.map((cast) => [cast.abilityID, cast]));
+/** Transforma uma lista de contagens em busca por habilidade e categoria de alvo. */
+function indexByComparisonKey(counts: CastCount[]): Map<string, CastCount> {
+  return new Map(counts.map((cast) => [cast.comparisonKey ?? `${cast.abilityID}:total`, cast]));
 }
 
 /**
@@ -16,28 +16,31 @@ export function compareCasts(
   referenceOne: CastCount[],
   referenceTwo: CastCount[],
 ): AbilityComparison[] {
-  const playerByAbility = indexByAbility(player);
-  const referenceOneByAbility = indexByAbility(referenceOne);
-  const referenceTwoByAbility = indexByAbility(referenceTwo);
-  const abilityIDs = new Set([
-    ...playerByAbility.keys(),
-    ...referenceOneByAbility.keys(),
-    ...referenceTwoByAbility.keys(),
+  const playerByKey = indexByComparisonKey(player);
+  const referenceOneByKey = indexByComparisonKey(referenceOne);
+  const referenceTwoByKey = indexByComparisonKey(referenceTwo);
+  const comparisonKeys = new Set([
+    ...playerByKey.keys(),
+    ...referenceOneByKey.keys(),
+    ...referenceTwoByKey.keys(),
   ]);
 
-  return [...abilityIDs]
-    .map((abilityID) => {
-      const playerCast = playerByAbility.get(abilityID);
-      const referenceOneCast = referenceOneByAbility.get(abilityID);
-      const referenceTwoCast = referenceTwoByAbility.get(abilityID);
+  return [...comparisonKeys]
+    .map((comparisonKey) => {
+      const playerCast = playerByKey.get(comparisonKey);
+      const referenceOneCast = referenceOneByKey.get(comparisonKey);
+      const referenceTwoCast = referenceTwoByKey.get(comparisonKey);
+      const abilityID = playerCast?.abilityID ?? referenceOneCast?.abilityID ?? referenceTwoCast?.abilityID ?? 0;
       const playerCasts = playerCast?.count ?? 0;
       const referenceOneCasts = referenceOneCast?.count ?? 0;
       const referenceTwoCasts = referenceTwoCast?.count ?? 0;
       const referenceAverage = (referenceOneCasts + referenceTwoCasts) / 2;
 
       return {
+        comparisonKey,
         abilityID,
         abilityName: playerCast?.abilityName ?? referenceOneCast?.abilityName ?? referenceTwoCast?.abilityName ?? `Habilidade ${abilityID}`,
+        targetCategory: playerCast?.targetCategory ?? referenceOneCast?.targetCategory ?? referenceTwoCast?.targetCategory ?? "total",
         playerCasts,
         referenceOneCasts,
         referenceTwoCasts,

@@ -11,6 +11,7 @@ export const REPORT_METADATA_QUERY = `
           startTime
           endTime
           difficulty
+          keystoneLevel
           kill
           friendlyPlayers
           friendlySpecs
@@ -55,9 +56,9 @@ export const REPORT_CASTS_QUERY = `
 `;
 
 export const RANKING_CANDIDATES_QUERY = `
-  query RankingCandidates($encounterID: Int!, $difficulty: Int!, $className: String!, $specName: String!, $page: Int!) {
+  query RankingCandidates($encounterID: Int!, $difficulty: Int!, $bracket: Int!, $metric: CharacterRankingMetricType!, $className: String!, $specName: String!, $page: Int!) {
     worldData { encounter(id: $encounterID) {
-      characterRankings(difficulty: $difficulty, className: $className, specName: $specName, page: $page, bracket: 0)
+      characterRankings(difficulty: $difficulty, bracket: $bracket, metric: $metric, className: $className, specName: $specName, page: $page)
     }}
   }
 `;
@@ -72,7 +73,7 @@ export const REPORT_ACTORS_QUERY = `
 `;
 
 export const REPORT_RANKINGS_QUERY = `
-  query ReportRankings($code: String!, $fightIDs: [Int!]) {
-    reportData { report(code: $code, allowUnlisted: false) { rankings(fightIDs: $fightIDs) } }
+  query ReportRankings($code: String!, $fightIDs: [Int!], $playerMetric: ReportRankingMetricType!) {
+    reportData { report(code: $code, allowUnlisted: false) { rankings(fightIDs: $fightIDs, playerMetric: $playerMetric) } }
   }
 `;

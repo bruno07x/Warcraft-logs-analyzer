@@ -43,9 +43,9 @@ export async function analyzeLogs(playerReference: LogReference): Promise<Result
   const references = await findReferences(playerResult.value); if (!references.ok) return references;
   const logs = { player: playerResult.value, referenceOne: references.value.referenceOne.log, referenceTwo: references.value.referenceTwo.log };
 
-  const playerCasts = countCasts(logs.player.casts, logs.player.metadata.sourceID, logs.player.abilityNames);
-  const referenceOneCasts = countCasts(logs.referenceOne.casts, logs.referenceOne.metadata.sourceID, logs.referenceOne.abilityNames);
-  const referenceTwoCasts = countCasts(logs.referenceTwo.casts, logs.referenceTwo.metadata.sourceID, logs.referenceTwo.abilityNames);
+  const playerCasts = countCasts(logs.player.casts, logs.player.metadata.sourceID, logs.player.abilityNames, logs.player.friendlyActorIDs);
+  const referenceOneCasts = countCasts(logs.referenceOne.casts, logs.referenceOne.metadata.sourceID, logs.referenceOne.abilityNames, logs.referenceOne.friendlyActorIDs);
+  const referenceTwoCasts = countCasts(logs.referenceTwo.casts, logs.referenceTwo.metadata.sourceID, logs.referenceTwo.abilityNames, logs.referenceTwo.friendlyActorIDs);
   const comparisons = compareCasts(playerCasts, referenceOneCasts, referenceTwoCasts);
 
   return {

@@ -1,4 +1,4 @@
-import type { LogReference, Result } from "@/types/analysis";
+import type { LogReference, RankingMetric, Result } from "@/types/analysis";
 
 /**
  * Lê um único identificador decimal positivo, sem coerções como "2e3" ou "2.5".
@@ -12,10 +12,19 @@ function readPositiveID(params: URLSearchParams, name: string): number | null {
   return Number.isSafeInteger(value) && value > 0 ? value : null;
 }
 
+/** Converte a aba de throughput do Warcraft Logs na métrica de rankings correspondente. */
+function readRankingMetric(params: URLSearchParams): RankingMetric | null {
+  const values = params.getAll("type");
+  if (values.length !== 1) return null;
+  if (values[0] === "healing") return "hps";
+  if (values[0] === "damage-done") return "dps";
+  return null;
+}
+
 /**
  * Extrai relatório, luta e personagem de uma URL oficial do Warcraft Logs.
  * Não consulta a API: formato válido não comprova existência ou acesso público.
- * Parâmetros desconhecidos e fragmentos não participam da identificação.
+ * A aba deve ser `healing` ou `damage-done`; outros tipos não definem uma comparação de throughput.
  * @param input URL colada pelo usuário, com espaços externos opcionais.
  * @returns Identificadores ou erro de domínio; entradas inválidas não lançam exceção.
  */
@@ -78,5 +87,13 @@ export function parseLogUrl(input: string): Result<LogReference> {
     };
   }
 
-  return { ok: true, value: { reportCode: reportMatch[1], fightID, sourceID } };
+  const rankingMetric = readRankingMetric(url.searchParams);
+  if (rankingMetric === null) {
+    return {
+      ok: false,
+      error: { code: "invalid_type", message: "Use um log na aba de cura (type=healing) ou dano causado (type=damage-done)." },
+    };
+  }
+
+  return { ok: true, value: { reportCode: reportMatch[1], fightID, sourceID, rankingMetric } };
 }

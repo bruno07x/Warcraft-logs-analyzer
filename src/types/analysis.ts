@@ -3,7 +3,11 @@ export type LogReference = {
   reportCode: string;
   fightID: number;
   sourceID: number;
+  rankingMetric?: RankingMetric;
 };
+
+/** Métrica de throughput que define a categoria do ranking de referência. */
+export type RankingMetric = "hps" | "dps";
 
 /** Posição de cada log na comparação; também nomeia os query parameters. */
 export type LogSlot = "player" | "referenceOne" | "referenceTwo";
@@ -29,8 +33,15 @@ export type Result<T> =
 export type CastEvent = {
   type: string;
   sourceID: number;
+  targetID?: number;
   abilityID: number;
 };
+
+/** Papel do alvo de um cast, preservando o total para leitura geral. */
+export type CastTargetCategory = "total" | "ally" | "enemy" | "unknown";
+
+/** Atributo de combate observado no personagem durante a luta. */
+export type CombatStat = { label: string; value: number };
 
 /** Dados necessários para contextualizar um jogador e sua luta. */
 export type LogMetadata = {
@@ -43,9 +54,12 @@ export type LogMetadata = {
   className?: string;
   specialization?: string;
   difficulty?: string;
+  keystoneLevel?: number;
+  rankingMetric?: RankingMetric;
   kill?: boolean;
-  itemLevel: number;
   durationMs: number;
+  reportUrl: string;
+  combatStats: CombatStat[];
 };
 
 /** Resultado da integração antes das regras de contagem e comparação. */
@@ -53,19 +67,24 @@ export type FetchedLog = {
   metadata: LogMetadata;
   casts: CastEvent[];
   abilityNames: Record<number, string>;
+  friendlyActorIDs: number[];
 };
 
 /** Total de casts concluídos de uma habilidade por personagem. */
 export type CastCount = {
+  comparisonKey?: string;
   abilityID: number;
   abilityName: string;
+  targetCategory?: CastTargetCategory;
   count: number;
 };
 
 /** Uma habilidade alinhada entre jogador e duas referências. */
 export type AbilityComparison = {
+  comparisonKey?: string;
   abilityID: number;
   abilityName: string;
+  targetCategory?: CastTargetCategory;
   playerCasts: number;
   referenceOneCasts: number;
   referenceTwoCasts: number;
@@ -75,6 +94,7 @@ export type AbilityComparison = {
 
 /** Observação determinística sobre uma única diferença de contagem. */
 export type Observation = {
+  comparisonKey?: string;
   abilityID: number;
   severity: "critical" | "warning" | "positive" | "neutral";
   message: string;

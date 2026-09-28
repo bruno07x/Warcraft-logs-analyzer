@@ -1,4 +1,4 @@
-import type { CastEvent, LogMetadata, LogReference } from "@/types/analysis";
+import type { CastEvent, CombatStat, LogMetadata, LogReference } from "@/types/analysis";
 import { WarcraftLogsError } from "./errors";
 
 type MetadataPayload = {
@@ -6,6 +6,7 @@ type MetadataPayload = {
   startTime: number;
   endTime: number;
   abilityNames: Record<number, string>;
+  friendlyActorIDs: number[];
 };
 
 type EventPage = { events: CastEvent[]; nextPageTimestamp: number | null };
@@ -19,6 +20,31 @@ function invalidResponse(): never {
 function record(value: unknown): Record<string, unknown> {
   if (typeof value !== "object" || value === null || Array.isArray(value)) invalidResponse();
   return value as Record<string, unknown>;
+}
+
+/** Identifica um objeto indexável sem invalidar metadados opcionais. */
+function optionalRecord(value: unknown): Record<string, unknown> | undefined {
+  return typeof value === "object" && value !== null && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
+}
+
+/** Extrai os atributos requisitados sem deixar dados de combate ausentes bloquearem a análise. */
+function combatStatsFrom(playerDetailsValue: unknown, sourceID: number): CombatStat[] {
+  const playerDetails = optionalRecord(playerDetailsValue);
+  const detailsData = optionalRecord(playerDetails?.data);
+  const groups = optionalRecord(detailsData?.playerDetails);
+  const detail = groups && Object.values(groups)
+    .flatMap((group) => Array.isArray(group) ? group : [])
+    .map(optionalRecord)
+    .find((candidate) => candidate?.id === sourceID);
+  const stats = optionalRecord(optionalRecord(detail)?.combatantInfo)?.stats;
+  const statValues = optionalRecord(stats);
+  const statFor = (label: string): CombatStat | undefined => {
+    const stat = optionalRecord(statValues?.[label]);
+    const value = stat?.min;
+    return typeof value === "number" && Number.isFinite(value) ? { label, value } : undefined;
+  };
+  const primary = ["Intellect", "Strength", "Agility"].map(statFor).find((stat) => stat !== undefined);
+  return [primary, ...["Stamina", "Crit", "Haste", "Mastery", "Versatility"].map(statFor)].filter((stat): stat is CombatStat => stat !== undefined);
 }
 
 /** Lê um número finito, preservando timestamps relativos com casas decimais. */
@@ -76,6 +102,13 @@ export function decodeReportMetadata(value: unknown, reference: LogReference): M
 
   const masterData = record(report.masterData);
   if (!Array.isArray(masterData.actors) || !Array.isArray(masterData.abilities)) invalidResponse();
+  const friendlyActorIDs = new Set(fight.friendlyPlayers);
+  for (const actorValue of masterData.actors) {
+    const candidate = record(actorValue);
+    if (typeof candidate.petOwner === "number" && Number.isSafeInteger(candidate.petOwner) && friendlyActorIDs.has(candidate.petOwner)) {
+      friendlyActorIDs.add(safeInteger(candidate.id));
+    }
+  }
   const actorValue = masterData.actors.find((candidate) => {
     const actor = record(candidate);
     return actor.id === reference.sourceID;
@@ -87,17 +120,6 @@ export function decodeReportMetadata(value: unknown, reference: LogReference): M
   if (actor.type !== "Player" || actor.petOwner !== null) {
     throw new WarcraftLogsError("not_found", "O identificador selecionado não pertence a um personagem jogador.");
   }
-  const playerDetails = record(report.playerDetails);
-  const detail = Object.values(playerDetails)
-    .flatMap((group) => Array.isArray(group) ? group : [])
-    .map(record)
-    .find((candidate) => candidate.id === reference.sourceID);
-  if (detail === undefined) invalidResponse();
-  const minItemLevel = finiteNumber(detail.minItemLevel);
-  const maxItemLevel = finiteNumber(detail.maxItemLevel);
-  if (minItemLevel <= 0 || maxItemLevel <= 0 || maxItemLevel < minItemLevel) invalidResponse();
-  const itemLevel = (minItemLevel + maxItemLevel) / 2;
-
   const abilityNames: Record<number, string> = {};
   for (const abilityValue of masterData.abilities) {
     const ability = record(abilityValue);
@@ -119,8 +141,14 @@ export function decodeReportMetadata(value: unknown, reference: LogReference): M
   const difficulty = difficultyValue === null || difficultyValue === undefined
     ? undefined
     : String(safeInteger(difficultyValue));
+  const keystoneLevelValue = fight.keystoneLevel;
+  const keystoneLevel = keystoneLevelValue === null || keystoneLevelValue === undefined
+    ? undefined
+    : safeInteger(keystoneLevelValue);
+  if (keystoneLevel !== undefined && keystoneLevel <= 0) invalidResponse();
   const killValue = fight.kill;
   if (killValue !== null && killValue !== undefined && typeof killValue !== "boolean") invalidResponse();
+  const combatStats = combatStatsFrom(report.playerDetails, reference.sourceID);
 
   return {
     metadata: {
@@ -133,13 +161,17 @@ export function decodeReportMetadata(value: unknown, reference: LogReference): M
       className: actor.subType === null || actor.subType === undefined ? undefined : nonEmptyString(actor.subType),
       specialization,
       difficulty,
+      keystoneLevel,
+      rankingMetric: reference.rankingMetric,
       kill: killValue ?? undefined,
-      itemLevel,
       durationMs: endTime - startTime,
+      reportUrl: `https://www.warcraftlogs.com/reports/${reference.reportCode}?fight=${fightID}&type=casts&source=${reference.sourceID}`,
+      combatStats,
     },
     startTime,
     endTime,
     abilityNames,
+    friendlyActorIDs: [...friendlyActorIDs],
   };
 }
 
@@ -155,7 +187,8 @@ export function decodeEventPage(value: unknown, sourceID: number): EventPage {
     if (eventSourceID !== sourceID) invalidResponse();
     const abilityID = safeInteger(event.abilityGameID);
     if (abilityID <= 0) invalidResponse();
-    return { type: nonEmptyString(event.type), sourceID: eventSourceID, abilityID };
+    const targetID = event.targetID === null || event.targetID === undefined ? undefined : safeInteger(event.targetID);
+    return { type: nonEmptyString(event.type), sourceID: eventSourceID, targetID, abilityID };
   });
 
   const cursor = paginator.nextPageTimestamp;
