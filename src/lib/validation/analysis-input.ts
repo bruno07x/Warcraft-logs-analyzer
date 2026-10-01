@@ -1,11 +1,11 @@
-import type {
-  AnalysisSearchParams,
-  LogReference,
-  Result,
-} from "@/types/analysis";
+import type { AnalysisSearchParams, LogReference, Result } from "@/types/analysis";
 import { parseLogUrl } from "./log-url";
 
-export const LOG_FIELD = { slot: "player", label: "Seu log", description: "O personagem que você quer analisar." } as const;
+export const LOG_FIELD = {
+  slot: "player",
+  label: "Seu log",
+  description: "O personagem que você quer analisar.",
+} as const;
 
 export const EXAMPLE_LOG_URL =
   "https://www.warcraftlogs.com/reports/acAK7PwjZnvrGLq8?fight=2&type=healing&source=235";
@@ -15,11 +15,17 @@ export const EXAMPLE_LOG_URL =
  * @param params Query parameters originais; arrays são rejeitados como ambíguos.
  * @returns As três referências ou o primeiro erro, identificado pelo seu slot.
  */
-export function validateAnalysisInput(
-  params: AnalysisSearchParams,
-): Result<LogReference> {
+export function validateAnalysisInput(params: AnalysisSearchParams): Result<LogReference> {
   const input = params.player;
-  if (Array.isArray(input)) return { ok: false, error: { code: "duplicate_log", message: "Informe apenas uma URL para seu log.", slot: "player" } };
+  if (Array.isArray(input))
+    return {
+      ok: false,
+      error: {
+        code: "duplicate_log",
+        message: "Informe apenas uma URL para seu log.",
+        slot: "player",
+      },
+    };
   const parsed = parseLogUrl(input ?? "");
   return parsed.ok ? parsed : { ok: false, error: { ...parsed.error, slot: "player" } };
 }

@@ -24,18 +24,18 @@ Após aprovação do plano e da execução direta, implementada a tarefa 1:
 
 Verificações executadas:
 
-| Verificação | Resultado |
-|---|---|
-| `pnpm install --frozen-lockfile` | Passou após autorização específica do script de `unrs-resolver` |
-| `pnpm typecheck` | Passou, incluindo geração dos tipos das rotas |
-| `pnpm lint` | Passou sem avisos ou erros |
-| `pnpm build` | Passou; `/` e `/analysis` renderizadas no servidor por requisição |
-| Parser no terminal | 29 entradas conferidas, incluindo formatos válidos, origem inválida, credenciais e IDs ausentes/repetidos/inválidos |
-| Chromium — formulário | Envio vazio, referência inválida, foco no primeiro erro e navegação válida conferidos |
-| Chromium — servidor/retorno | Reload, parâmetros ausentes/repetidos em cada slot e retorno após sucesso/erro preservando URLs codificadas conferidos |
-| Chromium — mobile | Formulário e resultado em 375px, sem overflow horizontal; capturas revisadas |
-| Chromium — sem JavaScript | Formulário GET chega ao resultado validado no servidor |
-| Chromium — rede e execução | Nenhuma requisição externa ou exceção de página observada |
+| Verificação                      | Resultado                                                                                                              |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `pnpm install --frozen-lockfile` | Passou após autorização específica do script de `unrs-resolver`                                                        |
+| `pnpm typecheck`                 | Passou, incluindo geração dos tipos das rotas                                                                          |
+| `pnpm lint`                      | Passou sem avisos ou erros                                                                                             |
+| `pnpm build`                     | Passou; `/` e `/analysis` renderizadas no servidor por requisição                                                      |
+| Parser no terminal               | 29 entradas conferidas, incluindo formatos válidos, origem inválida, credenciais e IDs ausentes/repetidos/inválidos    |
+| Chromium — formulário            | Envio vazio, referência inválida, foco no primeiro erro e navegação válida conferidos                                  |
+| Chromium — servidor/retorno      | Reload, parâmetros ausentes/repetidos em cada slot e retorno após sucesso/erro preservando URLs codificadas conferidos |
+| Chromium — mobile                | Formulário e resultado em 375px, sem overflow horizontal; capturas revisadas                                           |
+| Chromium — sem JavaScript        | Formulário GET chega ao resultado validado no servidor                                                                 |
+| Chromium — rede e execução       | Nenhuma requisição externa ou exceção de página observada                                                              |
 
 A ferramenta de navegador e as entradas exploratórias foram temporárias, sem criar suíte de testes no projeto. Não foram verificadas todas as combinações de browsers nem navegação por leitor de tela.
 
@@ -63,16 +63,16 @@ Implementada a camada server-side da tarefa 2:
 
 Verificações executadas:
 
-| Verificação | Resultado |
-|---|---|
-| `pnpm typecheck` | Passou |
-| `pnpm lint` | Passou sem avisos ou erros |
-| `pnpm build` | Passou após a adição da camada server-side |
+| Verificação                | Resultado                                                                                                                                                           |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm typecheck`           | Passou                                                                                                                                                              |
+| `pnpm lint`                | Passou sem avisos ou erros                                                                                                                                          |
+| `pnpm build`               | Passou após a adição da camada server-side                                                                                                                          |
 | Decodificadores sintéticos | Metadados e página válidos aceitos; relatório ausente, luta ausente, ator fora da luta, pet, habilidade/evento/cursor inválidos rejeitados com categorias esperadas |
-| Configuração ausente | `fetchLog` retornou `configuration` sem tentar rede e sem expor credenciais |
-| Paginação sintética | Duas páginas agregadas nos cursores `100 → 300 → fim`; token reutilizado; habilidade desconhecida recebeu fallback |
-| Renovação sintética | 401 descartou o primeiro token, obteve um segundo e repetiu a consulta uma única vez |
-| Rate limit sintético | 429 retornou `rate_limit` sem repetição |
+| Configuração ausente       | `fetchLog` retornou `configuration` sem tentar rede e sem expor credenciais                                                                                         |
+| Paginação sintética        | Duas páginas agregadas nos cursores `100 → 300 → fim`; token reutilizado; habilidade desconhecida recebeu fallback                                                  |
+| Renovação sintética        | 401 descartou o primeiro token, obteve um segundo e repetiu a consulta uma única vez                                                                                |
+| Rate limit sintético       | 429 retornou `rate_limit` sem repetição                                                                                                                             |
 
 Não havia `WARCRAFT_LOGS_CLIENT_ID` e `WARCRAFT_LOGS_CLIENT_SECRET` no ambiente. Portanto, autenticação e consultas contra o serviço real, relatório inexistente real e paginação real permanecem pendentes; não foram declarados validados. Os cenários sintéticos foram scripts temporários em `/tmp`, sem criar suíte automatizada no projeto.
 
@@ -89,12 +89,12 @@ Implementados os módulos puros de domínio para a tarefa 3:
 
 Verificações executadas:
 
-| Verificação | Resultado |
-|---|---|
+| Verificação                 | Resultado                                                                                                                              |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | Checagem manual descartável | 5 assertivas passaram: casts válidos, exclusão de `begincast`/outro ator, médias fracionárias, união, listas vazias e fallback de nome |
-| `pnpm typecheck` | Passou |
-| `pnpm lint` | Passou sem avisos ou erros |
-| `pnpm build` | Passou |
+| `pnpm typecheck`            | Passou                                                                                                                                 |
+| `pnpm lint`                 | Passou sem avisos ou erros                                                                                                             |
+| `pnpm build`                | Passou                                                                                                                                 |
 
 Próxima tarefa não iniciada: **tarefa 4 — regras determinísticas e coordenação dos três logs**. A validação contra a API real da tarefa 2 ainda depende de credenciais.
 
@@ -110,11 +110,11 @@ Implementadas as regras e a coordenação da tarefa 4:
 
 Verificações executadas:
 
-| Verificação | Resultado |
-|---|---|
+| Verificação                 | Resultado                                                                                                                                               |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Checagem manual descartável | 9 assertivas passaram: quatro severidades, diferenças fracionárias, encontro compatível/incompatível, falha localizada e metadados distintos permitidos |
-| `pnpm typecheck` | Passou após correção do estreitamento de resultados paralelos |
-| `pnpm lint` | Passou sem avisos ou erros |
-| `pnpm build` | Passou |
+| `pnpm typecheck`            | Passou após correção do estreitamento de resultados paralelos                                                                                           |
+| `pnpm lint`                 | Passou sem avisos ou erros                                                                                                                              |
+| `pnpm build`                | Passou                                                                                                                                                  |
 
 Próxima tarefa não iniciada: **tarefa 5 — interface final da análise**. A validação real da API da tarefa 2 continua pendente.

@@ -13,17 +13,26 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR">
       <body>
-        <a className="skip-link" href="#main-content">Pular para o conteúdo</a>
+        <a className="skip-link" href="#main-content">
+          Pular para o conteúdo
+        </a>
         <header className="site-header">
           <Link href="/" className="brand" aria-label="Warcraft Logs Analyzer — início">
-            <span className="brand-mark" aria-hidden="true">W</span>
-            <span>WARCRAFT LOGS <strong>ANALYZER</strong></span>
+            <span className="brand-mark" aria-hidden="true">
+              W
+            </span>
+            <span>
+              WARCRAFT LOGS <strong>ANALYZER</strong>
+            </span>
           </Link>
           <span className="version-label">MVP · Etapa 1</span>
         </header>
-        <main id="main-content" tabIndex={-1}>{children}</main>
+        <main id="main-content" tabIndex={-1}>
+          {children}
+        </main>
         <footer className="site-footer">
-          Projeto educacional independente. Não afiliado à Blizzard Entertainment ou ao Warcraft Logs.
+          Projeto educacional independente. Não afiliado à Blizzard Entertainment ou ao Warcraft
+          Logs.
         </footer>
       </body>
     </html>

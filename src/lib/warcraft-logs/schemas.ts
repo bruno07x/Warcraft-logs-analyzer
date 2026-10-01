@@ -13,7 +13,10 @@ type EventPage = { events: CastEvent[]; nextPageTimestamp: number | null };
 
 /** Lança um erro de contrato externo sem reproduzir o valor recebido. */
 function invalidResponse(): never {
-  throw new WarcraftLogsError("invalid_response", "O Warcraft Logs retornou uma resposta inesperada.");
+  throw new WarcraftLogsError(
+    "invalid_response",
+    "O Warcraft Logs retornou uma resposta inesperada.",
+  );
 }
 
 /** Garante que um valor desconhecido seja um objeto simples indexável. */
@@ -24,7 +27,9 @@ function record(value: unknown): Record<string, unknown> {
 
 /** Identifica um objeto indexável sem invalidar metadados opcionais. */
 function optionalRecord(value: unknown): Record<string, unknown> | undefined {
-  return typeof value === "object" && value !== null && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : undefined;
 }
 
 /** Extrai os atributos requisitados sem deixar dados de combate ausentes bloquearem a análise. */
@@ -32,10 +37,12 @@ function combatStatsFrom(playerDetailsValue: unknown, sourceID: number): CombatS
   const playerDetails = optionalRecord(playerDetailsValue);
   const detailsData = optionalRecord(playerDetails?.data);
   const groups = optionalRecord(detailsData?.playerDetails);
-  const detail = groups && Object.values(groups)
-    .flatMap((group) => Array.isArray(group) ? group : [])
-    .map(optionalRecord)
-    .find((candidate) => candidate?.id === sourceID);
+  const detail =
+    groups &&
+    Object.values(groups)
+      .flatMap((group) => (Array.isArray(group) ? group : []))
+      .map(optionalRecord)
+      .find((candidate) => candidate?.id === sourceID);
   const stats = optionalRecord(optionalRecord(detail)?.combatantInfo)?.stats;
   const statValues = optionalRecord(stats);
   const statFor = (label: string): CombatStat | undefined => {
@@ -43,8 +50,12 @@ function combatStatsFrom(playerDetailsValue: unknown, sourceID: number): CombatS
     const value = stat?.min;
     return typeof value === "number" && Number.isFinite(value) ? { label, value } : undefined;
   };
-  const primary = ["Intellect", "Strength", "Agility"].map(statFor).find((stat) => stat !== undefined);
-  return [primary, ...["Stamina", "Crit", "Haste", "Mastery", "Versatility"].map(statFor)].filter((stat): stat is CombatStat => stat !== undefined);
+  const primary = ["Intellect", "Strength", "Agility"]
+    .map(statFor)
+    .find((stat) => stat !== undefined);
+  return [primary, ...["Stamina", "Crit", "Haste", "Mastery", "Versatility"].map(statFor)].filter(
+    (stat): stat is CombatStat => stat !== undefined,
+  );
 }
 
 /** Lê um número finito, preservando timestamps relativos com casas decimais. */
@@ -84,7 +95,10 @@ export function decodeReportMetadata(value: unknown, reference: LogReference): M
   const report = reportFrom(value);
   if (nonEmptyString(report.code) !== reference.reportCode) invalidResponse();
   if (!Array.isArray(report.fights) || report.fights.length !== 1) {
-    throw new WarcraftLogsError("not_found", "A luta selecionada não foi encontrada neste relatório.");
+    throw new WarcraftLogsError(
+      "not_found",
+      "A luta selecionada não foi encontrada neste relatório.",
+    );
   }
   const fight = record(report.fights[0]);
   const fightID = safeInteger(fight.id);
@@ -105,7 +119,11 @@ export function decodeReportMetadata(value: unknown, reference: LogReference): M
   const friendlyActorIDs = new Set(fight.friendlyPlayers);
   for (const actorValue of masterData.actors) {
     const candidate = record(actorValue);
-    if (typeof candidate.petOwner === "number" && Number.isSafeInteger(candidate.petOwner) && friendlyActorIDs.has(candidate.petOwner)) {
+    if (
+      typeof candidate.petOwner === "number" &&
+      Number.isSafeInteger(candidate.petOwner) &&
+      friendlyActorIDs.has(candidate.petOwner)
+    ) {
       friendlyActorIDs.add(safeInteger(candidate.id));
     }
   }
@@ -114,11 +132,17 @@ export function decodeReportMetadata(value: unknown, reference: LogReference): M
     return actor.id === reference.sourceID;
   });
   if (actorValue === undefined) {
-    throw new WarcraftLogsError("not_found", "O personagem selecionado não foi encontrado neste relatório.");
+    throw new WarcraftLogsError(
+      "not_found",
+      "O personagem selecionado não foi encontrado neste relatório.",
+    );
   }
   const actor = record(actorValue);
   if (actor.type !== "Player" || actor.petOwner !== null) {
-    throw new WarcraftLogsError("not_found", "O identificador selecionado não pertence a um personagem jogador.");
+    throw new WarcraftLogsError(
+      "not_found",
+      "O identificador selecionado não pertence a um personagem jogador.",
+    );
   }
   const abilityNames: Record<number, string> = {};
   for (const abilityValue of masterData.abilities) {
@@ -138,16 +162,19 @@ export function decodeReportMetadata(value: unknown, reference: LogReference): M
   }
 
   const difficultyValue = fight.difficulty;
-  const difficulty = difficultyValue === null || difficultyValue === undefined
-    ? undefined
-    : String(safeInteger(difficultyValue));
+  const difficulty =
+    difficultyValue === null || difficultyValue === undefined
+      ? undefined
+      : String(safeInteger(difficultyValue));
   const keystoneLevelValue = fight.keystoneLevel;
-  const keystoneLevel = keystoneLevelValue === null || keystoneLevelValue === undefined
-    ? undefined
-    : safeInteger(keystoneLevelValue);
+  const keystoneLevel =
+    keystoneLevelValue === null || keystoneLevelValue === undefined
+      ? undefined
+      : safeInteger(keystoneLevelValue);
   if (keystoneLevel !== undefined && keystoneLevel <= 0) invalidResponse();
   const killValue = fight.kill;
-  if (killValue !== null && killValue !== undefined && typeof killValue !== "boolean") invalidResponse();
+  if (killValue !== null && killValue !== undefined && typeof killValue !== "boolean")
+    invalidResponse();
   const combatStats = combatStatsFrom(report.playerDetails, reference.sourceID);
 
   return {
@@ -158,7 +185,10 @@ export function decodeReportMetadata(value: unknown, reference: LogReference): M
       encounterID: safeInteger(fight.encounterID),
       encounterName: nonEmptyString(fight.name),
       characterName: nonEmptyString(actor.name),
-      className: actor.subType === null || actor.subType === undefined ? undefined : nonEmptyString(actor.subType),
+      className:
+        actor.subType === null || actor.subType === undefined
+          ? undefined
+          : nonEmptyString(actor.subType),
       specialization,
       difficulty,
       keystoneLevel,
@@ -187,7 +217,10 @@ export function decodeEventPage(value: unknown, sourceID: number): EventPage {
     if (eventSourceID !== sourceID) invalidResponse();
     const abilityID = safeInteger(event.abilityGameID);
     if (abilityID <= 0) invalidResponse();
-    const targetID = event.targetID === null || event.targetID === undefined ? undefined : safeInteger(event.targetID);
+    const targetID =
+      event.targetID === null || event.targetID === undefined
+        ? undefined
+        : safeInteger(event.targetID);
     return { type: nonEmptyString(event.type), sourceID: eventSourceID, targetID, abilityID };
   });
 

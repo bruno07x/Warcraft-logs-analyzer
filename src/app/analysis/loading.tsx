@@ -1,2 +1,20 @@
 /** Mostra uma transição de carregamento enquanto o servidor consulta os três relatórios. */
-export default function AnalysisLoading() { return <div className="page-shell loading-shell" role="status" aria-live="polite"><p className="eyebrow">CONSULTANDO RELATÓRIOS</p><h1>Preparando sua<br /><span>comparação.</span></h1><p className="intro-copy">Validando o encontro, os personagens e os casts concluídos.</p><div className="loading-bars" aria-hidden="true"><span /><span /><span /></div><span className="sr-only">A análise está carregando.</span></div>; }
+export default function AnalysisLoading() {
+  return (
+    <div className="page-shell loading-shell" role="status" aria-live="polite">
+      <p className="eyebrow">CONSULTANDO RELATÓRIOS</p>
+      <h1>
+        Preparando sua
+        <br />
+        <span>comparação.</span>
+      </h1>
+      <p className="intro-copy">Validando o encontro, os personagens e os casts concluídos.</p>
+      <div className="loading-bars" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+      </div>
+      <span className="sr-only">A análise está carregando.</span>
+    </div>
+  );
+}

@@ -25,9 +25,7 @@ export type AnalysisError = {
 };
 
 /** Obriga quem consome o resultado a tratar o erro antes de acessar os dados. */
-export type Result<T> =
-  | { ok: true; value: T }
-  | { ok: false; error: AnalysisError };
+export type Result<T> = { ok: true; value: T } | { ok: false; error: AnalysisError };
 
 /** Evento de cast já desacoplado do JSON variável retornado pela API. */
 export type CastEvent = {

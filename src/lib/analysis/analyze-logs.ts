@@ -40,12 +40,33 @@ async function fetchSlot(slot: LogSlot, reference: LogReference): Promise<Result
 export async function analyzeLogs(playerReference: LogReference): Promise<Result<AnalysisResult>> {
   const playerResult = await fetchSlot("player", playerReference);
   if (!playerResult.ok) return playerResult;
-  const references = await findReferences(playerResult.value); if (!references.ok) return references;
-  const logs = { player: playerResult.value, referenceOne: references.value.referenceOne.log, referenceTwo: references.value.referenceTwo.log };
+  const references = await findReferences(playerResult.value);
+  if (!references.ok) return references;
+  console.warn("DEBUG:📝: references=", references);
+  const logs = {
+    player: playerResult.value,
+    referenceOne: references.value.referenceOne.log,
+    referenceTwo: references.value.referenceTwo.log,
+  };
 
-  const playerCasts = countCasts(logs.player.casts, logs.player.metadata.sourceID, logs.player.abilityNames, logs.player.friendlyActorIDs);
-  const referenceOneCasts = countCasts(logs.referenceOne.casts, logs.referenceOne.metadata.sourceID, logs.referenceOne.abilityNames, logs.referenceOne.friendlyActorIDs);
-  const referenceTwoCasts = countCasts(logs.referenceTwo.casts, logs.referenceTwo.metadata.sourceID, logs.referenceTwo.abilityNames, logs.referenceTwo.friendlyActorIDs);
+  const playerCasts = countCasts(
+    logs.player.casts,
+    logs.player.metadata.sourceID,
+    logs.player.abilityNames,
+    logs.player.friendlyActorIDs,
+  );
+  const referenceOneCasts = countCasts(
+    logs.referenceOne.casts,
+    logs.referenceOne.metadata.sourceID,
+    logs.referenceOne.abilityNames,
+    logs.referenceOne.friendlyActorIDs,
+  );
+  const referenceTwoCasts = countCasts(
+    logs.referenceTwo.casts,
+    logs.referenceTwo.metadata.sourceID,
+    logs.referenceTwo.abilityNames,
+    logs.referenceTwo.friendlyActorIDs,
+  );
   const comparisons = compareCasts(playerCasts, referenceOneCasts, referenceTwoCasts);
 
   return {
@@ -56,7 +77,10 @@ export async function analyzeLogs(playerReference: LogReference): Promise<Result
         referenceOne: logs.referenceOne.metadata,
         referenceTwo: logs.referenceTwo.metadata,
       },
-      referencePercentiles: { referenceOne: references.value.referenceOne.percentile, referenceTwo: references.value.referenceTwo.percentile },
+      referencePercentiles: {
+        referenceOne: references.value.referenceOne.percentile,
+        referenceTwo: references.value.referenceTwo.percentile,
+      },
       comparisons,
       observations: createObservations(comparisons),
     },
