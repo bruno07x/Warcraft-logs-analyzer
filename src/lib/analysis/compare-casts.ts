@@ -1,6 +1,6 @@
 import type { AbilityComparison, CastCount } from "@/types/analysis";
 
-export const MINIMUM_REFERENCE_CASTS = 5;
+export const MINIMUM_REFERENCE_CASTS = 2;
 
 /** Transforma uma lista de contagens em busca por habilidade e categoria de alvo. */
 function indexByComparisonKey(counts: CastCount[]): Map<string, CastCount> {
@@ -8,7 +8,7 @@ function indexByComparisonKey(counts: CastCount[]): Map<string, CastCount> {
 }
 
 /**
- * Considera somente habilidades usadas ao menos cinco vezes por cada referência,
+ * Considera somente habilidades usadas ao menos três vezes por cada referência,
  * calcula média e diferença sem arredondar e as ordena pela maior média.
  */
 export function compareCasts(

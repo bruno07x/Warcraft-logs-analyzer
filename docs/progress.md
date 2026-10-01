@@ -117,4 +117,24 @@ Verificações executadas:
 | `pnpm lint`                 | Passou sem avisos ou erros                                                                                                                              |
 | `pnpm build`                | Passou                                                                                                                                                  |
 
-Próxima tarefa não iniciada: **tarefa 5 — interface final da análise**. A validação real da API da tarefa 2 continua pendente.
+No momento deste registro, a tarefa 5 — interface final da análise — ainda não havia começado, e a validação real da API da tarefa 2 estava pendente. Essas etapas foram concluídas posteriormente.
+
+## Timelines de burst do Holy Paladin
+
+- O decodificador valida e preserva o timestamp absoluto que vem em cada objeto do campo JSON `data` de casts do Warcraft Logs.
+- O catálogo de burst define Paladin/Holy com Avenging Wrath (`31884`) e janelas de `20_000` ms. O domínio calcula, por log, as duas primeiras ativações e mantém ausências como slots vazios.
+- A análise inclui timelines tipadas somente para especializações com regra. A seção visual mostra casts e offsets para os três logs, com estado “Burst não ativado” e colunas empilhadas em telas estreitas.
+- O roteiro manual para zero, uma ou duas ativações, ordenação, limite temporal, especializações sem regra e layout móvel está em `docs/manual-verification.md`.
+
+Verificações desta entrega:
+
+| Verificação                                    | Resultado                                                                                                                           |
+| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm format` e `pnpm format:check`            | Passaram                                                                                                                            |
+| `pnpm typecheck`                               | Passou                                                                                                                              |
+| `pnpm lint`                                    | Passou sem avisos ou erros                                                                                                          |
+| `pnpm build`                                   | Passou                                                                                                                              |
+| Warcraft Logs público Holy Paladin             | Fight 40 retornou 691 casts com timestamps finitos e duas ativações de Avenging Wrath; as janelas continham 27 e 34 casts           |
+| Rota `/analysis` com o relatório público       | HTML server-rendered incluiu a seção, Burst 1/2, personagem e Avenging Wrath em `0,0s`; análise completada sem erro                 |
+| Cenários zero/uma ativação                     | Não validados com um segundo relatório público nesta sessão                                                                         |
+| Inspeção visual do desktop e viewport de 375px | Não executada: não há navegador nem Playwright disponíveis nesta sessão; o CSS responsivo e o markup foram conferidos estaticamente |

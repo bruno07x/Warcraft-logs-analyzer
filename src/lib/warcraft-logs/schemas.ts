@@ -6,6 +6,7 @@ type MetadataPayload = {
   startTime: number;
   endTime: number;
   abilityNames: Record<number, string>;
+  abilityIcons: Record<number, string>;
   friendlyActorIDs: number[];
 };
 
@@ -145,6 +146,7 @@ export function decodeReportMetadata(value: unknown, reference: LogReference): M
     );
   }
   const abilityNames: Record<number, string> = {};
+  const abilityIcons: Record<number, string> = {};
   for (const abilityValue of masterData.abilities) {
     const ability = record(abilityValue);
     const gameID = safeInteger(ability.gameID);
@@ -152,6 +154,9 @@ export function decodeReportMetadata(value: unknown, reference: LogReference): M
     // identificar um cast comparável, mas não invalida as demais habilidades.
     if (gameID <= 0) continue;
     abilityNames[gameID] = nonEmptyString(ability.name);
+    if (typeof ability.icon === "string" && /^[a-z0-9_-]+\.jpg$/i.test(ability.icon)) {
+      abilityIcons[gameID] = ability.icon;
+    }
   }
 
   let specialization: string | undefined;
@@ -201,6 +206,7 @@ export function decodeReportMetadata(value: unknown, reference: LogReference): M
     startTime,
     endTime,
     abilityNames,
+    abilityIcons,
     friendlyActorIDs: [...friendlyActorIDs],
   };
 }
@@ -221,7 +227,13 @@ export function decodeEventPage(value: unknown, sourceID: number): EventPage {
       event.targetID === null || event.targetID === undefined
         ? undefined
         : safeInteger(event.targetID);
-    return { type: nonEmptyString(event.type), sourceID: eventSourceID, targetID, abilityID };
+    return {
+      type: nonEmptyString(event.type),
+      sourceID: eventSourceID,
+      targetID,
+      abilityID,
+      timestamp: finiteNumber(event.timestamp),
+    };
   });
 
   const cursor = paginator.nextPageTimestamp;

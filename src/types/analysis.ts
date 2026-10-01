@@ -33,7 +33,35 @@ export type CastEvent = {
   sourceID: number;
   targetID?: number;
   abilityID: number;
+  timestamp: number;
 };
+
+/** Regra declarativa que define o gatilho e a duração de uma janela de burst. */
+export type BurstDefinition = {
+  className: string;
+  specialization: string;
+  triggerAbilityID: number;
+  durationMs: number;
+  label: string;
+};
+
+/** Cast exibido na timeline com tempo relativo ao início da janela. */
+export type BurstCast = {
+  offsetMs: number;
+  abilityID: number;
+  abilityName: string;
+  abilityIcon?: string;
+};
+
+/** Janela de burst com duração fixa e casts em ordem temporal. */
+export type BurstWindow = {
+  label: string;
+  durationMs: number;
+  casts: BurstCast[];
+};
+
+/** Duas posições de janela para cada log; null indica que o burst não foi ativado. */
+export type BurstTimelines = Record<LogSlot, (BurstWindow | null)[]> & { durationMs: number };
 
 /** Papel do alvo de um cast, preservando o total para leitura geral. */
 export type CastTargetCategory = "total" | "ally" | "enemy" | "unknown";
@@ -65,6 +93,7 @@ export type FetchedLog = {
   metadata: LogMetadata;
   casts: CastEvent[];
   abilityNames: Record<number, string>;
+  abilityIcons: Record<number, string>;
   friendlyActorIDs: number[];
 };
 
@@ -103,5 +132,7 @@ export type AnalysisResult = {
   logs: Record<LogSlot, LogMetadata>;
   referencePercentiles: Pick<Record<LogSlot, number>, "referenceOne" | "referenceTwo">;
   comparisons: AbilityComparison[];
+  abilityIcons: Record<number, string>;
   observations: Observation[];
+  burstTimelines?: BurstTimelines;
 };

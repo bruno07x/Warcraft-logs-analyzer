@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { LogSummary } from "@/components/log-summary";
+import { BurstTimelines } from "@/components/burst-timelines";
+import { AbilityIcon } from "@/components/ability-icon";
 import type { AbilityComparison, AnalysisResult, Observation } from "@/types/analysis";
 
 /** Formata contagens sem arredondar os valores calculados pelo domínio. */
@@ -67,7 +69,7 @@ export function AnalysisResults({
         <span>em comparação.</span>
       </h1>
       <p className="intro-copy">
-        Contagens absolutas de casts concluídos. A tabela inclui habilidades usadas ao menos cinco
+        Contagens absolutas de casts concluídos. A tabela inclui habilidades usadas ao menos três
         vezes por cada referência, em ordem decrescente da média. Duração, estratégia, talentos e
         equipamento não são normalizados nem avaliados.
       </p>
@@ -108,7 +110,10 @@ export function AnalysisResults({
                         ? "Acima da média"
                         : "Na média"}
                 </strong>
-                <span>{observation.message}</span>
+                <span className="observation-message">
+                  <AbilityIcon icon={analysis.abilityIcons[observation.abilityID]} />
+                  <span>{observation.message}</span>
+                </span>
               </li>
             ))}
           </ul>
@@ -162,7 +167,12 @@ export function AnalysisResults({
               <tbody>
                 {visibleComparisons.map((comparison) => (
                   <tr key={comparisonKey(comparison)}>
-                    <th scope="row">{comparison.abilityName}</th>
+                    <th scope="row">
+                      <span className="ability-label">
+                        <AbilityIcon icon={analysis.abilityIcons[comparison.abilityID]} />
+                        {comparison.abilityName}
+                      </span>
+                    </th>
                     <td>{formatNumber(comparison.playerCasts)}</td>
                     <td>{formatNumber(comparison.referenceOneCasts)}</td>
                     <td>{formatNumber(comparison.referenceTwoCasts)}</td>
@@ -187,6 +197,16 @@ export function AnalysisResults({
           <p className="empty-state">Nenhuma habilidade corresponde aos filtros atuais.</p>
         )}
       </section>
+      {analysis.burstTimelines && (
+        <BurstTimelines
+          timelines={analysis.burstTimelines}
+          characterNames={{
+            player: analysis.logs.player.characterName,
+            referenceOne: analysis.logs.referenceOne.characterName,
+            referenceTwo: analysis.logs.referenceTwo.characterName,
+          }}
+        />
+      )}
       <Link className="button-link" href={returnHref}>
         ← Voltar ao formulário
       </Link>
