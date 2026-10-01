@@ -10,7 +10,9 @@ let cachedToken: CachedToken | undefined;
 let pendingToken: Promise<string> | undefined;
 
 /** Lê uma string não vazia do ambiente sem incluir seu valor em mensagens. */
-function requireCredential(name: "WARCRAFT_LOGS_CLIENT_ID" | "WARCRAFT_LOGS_CLIENT_SECRET"): string {
+function requireCredential(
+  name: "WARCRAFT_LOGS_CLIENT_ID" | "WARCRAFT_LOGS_CLIENT_SECRET",
+): string {
   const value = process.env[name]?.trim();
   if (!value) {
     throw new WarcraftLogsError(
@@ -24,7 +26,10 @@ function requireCredential(name: "WARCRAFT_LOGS_CLIENT_ID" | "WARCRAFT_LOGS_CLIE
 /** Verifica o formato mínimo da resposta OAuth antes de armazená-la. */
 function decodeTokenResponse(value: unknown): { accessToken: string; expiresIn: number } {
   if (typeof value !== "object" || value === null) {
-    throw new WarcraftLogsError("invalid_response", "O Warcraft Logs retornou uma resposta inesperada.");
+    throw new WarcraftLogsError(
+      "invalid_response",
+      "O Warcraft Logs retornou uma resposta inesperada.",
+    );
   }
   const data = value as Record<string, unknown>;
   if (
@@ -34,7 +39,10 @@ function decodeTokenResponse(value: unknown): { accessToken: string; expiresIn: 
     !Number.isFinite(data.expires_in) ||
     data.expires_in <= 0
   ) {
-    throw new WarcraftLogsError("invalid_response", "O Warcraft Logs retornou uma resposta inesperada.");
+    throw new WarcraftLogsError(
+      "invalid_response",
+      "O Warcraft Logs retornou uma resposta inesperada.",
+    );
   }
   return { accessToken: data.access_token, expiresIn: data.expires_in };
 }
@@ -59,13 +67,22 @@ async function requestAccessToken(): Promise<string> {
       signal: controller.signal,
     });
     if (response.status === 401 || response.status === 403) {
-      throw new WarcraftLogsError("authentication", "Não foi possível autenticar a integração com o Warcraft Logs.");
+      throw new WarcraftLogsError(
+        "authentication",
+        "Não foi possível autenticar a integração com o Warcraft Logs.",
+      );
     }
     if (response.status === 429) {
-      throw new WarcraftLogsError("rate_limit", "O Warcraft Logs limitou as consultas. Tente novamente em instantes.");
+      throw new WarcraftLogsError(
+        "rate_limit",
+        "O Warcraft Logs limitou as consultas. Tente novamente em instantes.",
+      );
     }
     if (!response.ok) {
-      throw new WarcraftLogsError("unavailable", "O Warcraft Logs está indisponível no momento. Tente novamente em instantes.");
+      throw new WarcraftLogsError(
+        "unavailable",
+        "O Warcraft Logs está indisponível no momento. Tente novamente em instantes.",
+      );
     }
     const token = decodeTokenResponse(await response.json());
     cachedToken = {
@@ -76,7 +93,11 @@ async function requestAccessToken(): Promise<string> {
   } catch (error) {
     if (error instanceof WarcraftLogsError) throw error;
     if (error instanceof SyntaxError) {
-      throw new WarcraftLogsError("invalid_response", "O Warcraft Logs retornou uma resposta inesperada.", { cause: error });
+      throw new WarcraftLogsError(
+        "invalid_response",
+        "O Warcraft Logs retornou uma resposta inesperada.",
+        { cause: error },
+      );
     }
     throw new WarcraftLogsError(
       "unavailable",

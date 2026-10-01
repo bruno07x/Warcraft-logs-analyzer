@@ -7,5 +7,10 @@
     "outDir": ".test-dist",
     "rootDir": "."
   },
-  "include": ["src/lib/analysis/compare-casts.ts", "src/lib/analysis/observations.ts", "src/types/analysis.ts", "tests/**/*.ts"]
+  "include": [
+    "src/lib/analysis/compare-casts.ts",
+    "src/lib/analysis/observations.ts",
+    "src/types/analysis.ts",
+    "tests/**/*.ts"
+  ]
 }

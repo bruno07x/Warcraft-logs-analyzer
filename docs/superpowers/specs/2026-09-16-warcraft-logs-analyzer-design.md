@@ -212,10 +212,10 @@ A página apresentará:
 
 Colunas da tabela:
 
-| Habilidade | Você | Referência 1 | Referência 2 | Média | Diferença |
-|---|---:|---:|---:|---:|---:|
-| Avenging Wrath | 2 | 3 | 3 | 3 | -1 |
-| Holy Shock | 38 | 42 | 40 | 41 | -3 |
+| Habilidade     | Você | Referência 1 | Referência 2 | Média | Diferença |
+| -------------- | ---: | -----------: | -----------: | ----: | --------: |
+| Avenging Wrath |    2 |            3 |            3 |     3 |        -1 |
+| Holy Shock     |   38 |           42 |           40 |    41 |        -3 |
 
 A interface será responsiva e usará cores discretas, acompanhadas por texto ou ícone, para não depender exclusivamente de cor.
 

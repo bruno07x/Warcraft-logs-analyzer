@@ -32,20 +32,20 @@ Os cinco itens acima serão cobertos por verificações manuais documentadas nas
 
 ## Mapa de arquivos
 
-| Arquivos | Responsabilidade |
-|---|---|
-| `src/types/analysis.ts` | Tipos de item level, referência ranqueada, entrada de um log e percentis da análise. |
-| `src/lib/validation/analysis-input.ts` | Aceita e serializa somente a URL `player`. |
-| `src/lib/warcraft-logs/queries.ts` | Query de metadados com detalhe de combatente e query de rankings. |
-| `src/lib/warcraft-logs/schemas.ts` | Decodifica item level e ranking JSON em tipos internos validados. |
-| `src/lib/warcraft-logs/report.ts` | Expõe metadados completos de um relatório público. |
-| `src/lib/warcraft-logs/rankings.ts` | Busca páginas de ranking e retorna candidatos normalizados. |
-| `src/lib/analysis/reference-selection.ts` | Aplica compatibilidade, deduplicação, fallback de percentil e validação final. |
-| `src/lib/analysis/analyze-logs.ts` | Coordena um log do jogador, descoberta das referências e comparação. |
-| `src/components/log-form.tsx`, `src/app/page.tsx` | Formulário de URL única e cópia de orientação. |
-| `src/components/log-summary.tsx`, `src/components/analysis-results.tsx` | Exibe item level e percentil das referências. |
-| `src/app/analysis/page.tsx` | Lê a entrada única e apresenta falhas de descoberta. |
-| `README.md`, `docs/manual-verification.md`, `docs/progress.md` | Documentação de API, comportamento, roteiro e evidências de verificação. |
+| Arquivos                                                                | Responsabilidade                                                                     |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `src/types/analysis.ts`                                                 | Tipos de item level, referência ranqueada, entrada de um log e percentis da análise. |
+| `src/lib/validation/analysis-input.ts`                                  | Aceita e serializa somente a URL `player`.                                           |
+| `src/lib/warcraft-logs/queries.ts`                                      | Query de metadados com detalhe de combatente e query de rankings.                    |
+| `src/lib/warcraft-logs/schemas.ts`                                      | Decodifica item level e ranking JSON em tipos internos validados.                    |
+| `src/lib/warcraft-logs/report.ts`                                       | Expõe metadados completos de um relatório público.                                   |
+| `src/lib/warcraft-logs/rankings.ts`                                     | Busca páginas de ranking e retorna candidatos normalizados.                          |
+| `src/lib/analysis/reference-selection.ts`                               | Aplica compatibilidade, deduplicação, fallback de percentil e validação final.       |
+| `src/lib/analysis/analyze-logs.ts`                                      | Coordena um log do jogador, descoberta das referências e comparação.                 |
+| `src/components/log-form.tsx`, `src/app/page.tsx`                       | Formulário de URL única e cópia de orientação.                                       |
+| `src/components/log-summary.tsx`, `src/components/analysis-results.tsx` | Exibe item level e percentil das referências.                                        |
+| `src/app/analysis/page.tsx`                                             | Lê a entrada única e apresenta falhas de descoberta.                                 |
+| `README.md`, `docs/manual-verification.md`, `docs/progress.md`          | Documentação de API, comportamento, roteiro e evidências de verificação.             |
 
 ### Task 1: Enriquecer o log do jogador e migrar a entrada para URL única
 

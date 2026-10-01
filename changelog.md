@@ -4,11 +4,13 @@
 
 - A seleção automática de referências agora respeita a métrica do log fornecido: HPS para cura e DPS para dano.
 - Referências são filtradas pelo mesmo encontro, dificuldade, nível de Mítica+, especialização, classe e vitória.
+- A seleção de referências em raids não interpreta mais `bracketData` dos rankings como nível de Mítica+; o nível é validado pelos metadados da luta.
 - A duração da referência é limitada a uma tolerância de 30 segundos em relação ao log analisado.
 - A busca usa a paginação dos rankings e a conversão correta do nível da chave para o `bracket` da API do Warcraft Logs.
 - Habilidades usadas tanto em aliados quanto em inimigos passam a mostrar linhas separadas para cada tipo de alvo, além do total.
 - Casts sem alvo identificado continuam no total da habilidade, mas não aparecem como uma categoria separada.
 - Os cabeçalhos da tabela agora identificam cada referência pelo nome do jogador.
+- Configuração do Prettier para formatar o projeto, com os comandos `pnpm format` e `pnpm format:check`.
 
 ## Versão 1 — Analisador inicial de logs
 

@@ -8,12 +8,18 @@ import { decodeEventPage, decodeReportMetadata } from "./schemas";
 /** Mensagens públicas por categoria, sem conteúdo do GraphQL ou da exceção original. */
 function publicMessage(code: ReturnType<typeof asWarcraftLogsError>["code"]): string {
   switch (code) {
-    case "configuration": return "A integração com o Warcraft Logs ainda não foi configurada neste servidor.";
-    case "authentication": return "Não foi possível autenticar a integração com o Warcraft Logs.";
-    case "rate_limit": return "O Warcraft Logs limitou as consultas. Tente novamente em instantes.";
-    case "not_found": return "O relatório, a luta ou o personagem não foi encontrado ou não é público.";
-    case "invalid_response": return "O Warcraft Logs retornou dados que não puderam ser validados.";
-    case "unavailable": return "O Warcraft Logs está indisponível no momento. Tente novamente em instantes.";
+    case "configuration":
+      return "A integração com o Warcraft Logs ainda não foi configurada neste servidor.";
+    case "authentication":
+      return "Não foi possível autenticar a integração com o Warcraft Logs.";
+    case "rate_limit":
+      return "O Warcraft Logs limitou as consultas. Tente novamente em instantes.";
+    case "not_found":
+      return "O relatório, a luta ou o personagem não foi encontrado ou não é público.";
+    case "invalid_response":
+      return "O Warcraft Logs retornou dados que não puderam ser validados.";
+    case "unavailable":
+      return "O Warcraft Logs está indisponível no momento. Tente novamente em instantes.";
   }
 }
 
@@ -34,7 +40,10 @@ export async function fetchLog(reference: LogReference): Promise<Result<FetchedL
 
     while (cursor < metadataPayload.endTime) {
       if (seenCursors.has(cursor)) {
-        throw new WarcraftLogsError("invalid_response", "O Warcraft Logs retornou uma paginação inválida.");
+        throw new WarcraftLogsError(
+          "invalid_response",
+          "O Warcraft Logs retornou uma paginação inválida.",
+        );
       }
       seenCursors.add(cursor);
       const page = await queryWarcraftLogs(
@@ -51,7 +60,10 @@ export async function fetchLog(reference: LogReference): Promise<Result<FetchedL
       casts.push(...page.events);
       if (page.nextPageTimestamp === null) break;
       if (page.nextPageTimestamp <= cursor || page.nextPageTimestamp > metadataPayload.endTime) {
-        throw new WarcraftLogsError("invalid_response", "O Warcraft Logs retornou uma paginação inválida.");
+        throw new WarcraftLogsError(
+          "invalid_response",
+          "O Warcraft Logs retornou uma paginação inválida.",
+        );
       }
       cursor = page.nextPageTimestamp;
     }

@@ -39,7 +39,10 @@ export function parseLogUrl(input: string): Result<LogReference> {
   if (!/^https:\/\//i.test(text) || /[\s\\]/.test(text)) {
     return {
       ok: false,
-      error: { code: "invalid_url", message: "Use uma URL completa iniciada por https://www.warcraftlogs.com/reports/." },
+      error: {
+        code: "invalid_url",
+        message: "Use uma URL completa iniciada por https://www.warcraftlogs.com/reports/.",
+      },
     };
   }
 
@@ -47,7 +50,13 @@ export function parseLogUrl(input: string): Result<LogReference> {
   try {
     url = new URL(text);
   } catch {
-    return { ok: false, error: { code: "invalid_url", message: "A URL não é válida. Copie o endereço completo do relatório." } };
+    return {
+      ok: false,
+      error: {
+        code: "invalid_url",
+        message: "A URL não é válida. Copie o endereço completo do relatório.",
+      },
+    };
   }
 
   if (
@@ -59,7 +68,10 @@ export function parseLogUrl(input: string): Result<LogReference> {
   ) {
     return {
       ok: false,
-      error: { code: "invalid_origin", message: "Use apenas https://www.warcraftlogs.com, sem credenciais ou portas alternativas." },
+      error: {
+        code: "invalid_origin",
+        message: "Use apenas https://www.warcraftlogs.com, sem credenciais ou portas alternativas.",
+      },
     };
   }
 
@@ -67,7 +79,10 @@ export function parseLogUrl(input: string): Result<LogReference> {
   if (!reportMatch) {
     return {
       ok: false,
-      error: { code: "invalid_report", message: "A URL deve conter /reports/ seguido pelo código do relatório." },
+      error: {
+        code: "invalid_report",
+        message: "A URL deve conter /reports/ seguido pelo código do relatório.",
+      },
     };
   }
 
@@ -75,7 +90,11 @@ export function parseLogUrl(input: string): Result<LogReference> {
   if (fightID === null) {
     return {
       ok: false,
-      error: { code: "invalid_fight", message: "Selecione uma luta específica: fight deve aparecer uma vez, com um número inteiro positivo." },
+      error: {
+        code: "invalid_fight",
+        message:
+          "Selecione uma luta específica: fight deve aparecer uma vez, com um número inteiro positivo.",
+      },
     };
   }
 
@@ -83,7 +102,11 @@ export function parseLogUrl(input: string): Result<LogReference> {
   if (sourceID === null) {
     return {
       ok: false,
-      error: { code: "invalid_source", message: "Selecione um personagem: source deve aparecer uma vez, com um número inteiro positivo." },
+      error: {
+        code: "invalid_source",
+        message:
+          "Selecione um personagem: source deve aparecer uma vez, com um número inteiro positivo.",
+      },
     };
   }
 
@@ -91,7 +114,10 @@ export function parseLogUrl(input: string): Result<LogReference> {
   if (rankingMetric === null) {
     return {
       ok: false,
-      error: { code: "invalid_type", message: "Use um log na aba de cura (type=healing) ou dano causado (type=damage-done)." },
+      error: {
+        code: "invalid_type",
+        message: "Use um log na aba de cura (type=healing) ou dano causado (type=damage-done).",
+      },
     };
   }
 

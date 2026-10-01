@@ -32,7 +32,11 @@ export function LogForm({ initialInput }: { initialInput: string }) {
     const nextErrors: Partial<Record<LogSlot, string>> = {};
     let firstInvalid: LogSlot | undefined;
 
-    const result = parseLogUrl(input); if (!result.ok) { nextErrors.player = result.error.message; firstInvalid = "player"; }
+    const result = parseLogUrl(input);
+    if (!result.ok) {
+      nextErrors.player = result.error.message;
+      firstInvalid = "player";
+    }
 
     setErrors(nextErrors);
     if (firstInvalid) {
@@ -53,8 +57,15 @@ export function LogForm({ initialInput }: { initialInput: string }) {
     const error = errors[slot];
     return (
       <div className="log-field" key={slot}>
-        <label htmlFor={slot}><span className="field-number" aria-hidden="true">0{index + 1}</span>{label}</label>
-        <p id={`${slot}-description`} className="field-description">{description}</p>
+        <label htmlFor={slot}>
+          <span className="field-number" aria-hidden="true">
+            0{index + 1}
+          </span>
+          {label}
+        </label>
+        <p id={`${slot}-description`} className="field-description">
+          {description}
+        </p>
         <input
           id={slot}
           name={slot}
@@ -70,8 +81,14 @@ export function LogForm({ initialInput }: { initialInput: string }) {
           onChange={handleChange}
           readOnly={isPending}
         />
-        <p className="field-example" id={`${slot}-example`}>Exemplo: <code>{EXAMPLE_LOG_URL}</code></p>
-        {error && <p className="field-error" id={`${slot}-error`}>Erro: {error}</p>}
+        <p className="field-example" id={`${slot}-example`}>
+          Exemplo: <code>{EXAMPLE_LOG_URL}</code>
+        </p>
+        {error && (
+          <p className="field-error" id={`${slot}-error`}>
+            Erro: {error}
+          </p>
+        )}
       </div>
     );
   }
@@ -82,11 +99,16 @@ export function LogForm({ initialInput }: { initialInput: string }) {
       <div className="form-actions">
         <p>Os links ficam no endereço da página para você poder voltar e compartilhá-los.</p>
         <button type="submit" disabled={isPending}>
-          {isPending ? "Buscando…" : "Encontrar referências"}<span aria-hidden="true"> →</span>
+          {isPending ? "Buscando…" : "Encontrar referências"}
+          <span aria-hidden="true"> →</span>
         </button>
       </div>
       <p className="sr-only" role="status">
-        {Object.keys(errors).length > 0 ? "Há URLs inválidas. Revise os campos indicados." : isPending ? "Preparando os links." : ""}
+        {Object.keys(errors).length > 0
+          ? "Há URLs inválidas. Revise os campos indicados."
+          : isPending
+            ? "Preparando os links."
+            : ""}
       </p>
     </form>
   );

@@ -1,0 +1,10 @@
+node_modules/
+.next/
+.test-dist/
+out/
+build/
+coverage/
+.superpowers/
+.worktrees/
+next-env.d.ts
+pnpm-lock.yaml

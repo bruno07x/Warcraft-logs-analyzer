@@ -21,9 +21,9 @@ function timesLabel(value: number): string {
 /** Converte uma comparação em descrição observável, sem prescrever uma decisão de jogo. */
 function createObservation(comparison: AbilityComparison): Observation {
   if (
-    comparison.playerCasts === 0
-    && comparison.referenceOneCasts >= MINIMUM_REFERENCE_CASTS
-    && comparison.referenceTwoCasts >= MINIMUM_REFERENCE_CASTS
+    comparison.playerCasts === 0 &&
+    comparison.referenceOneCasts >= MINIMUM_REFERENCE_CASTS &&
+    comparison.referenceTwoCasts >= MINIMUM_REFERENCE_CASTS
   ) {
     return {
       comparisonKey: comparison.comparisonKey,
@@ -65,10 +65,13 @@ function createObservation(comparison: AbilityComparison): Observation {
  * O desempate por identificador mantém a ordem estável quando nomes coincidem.
  */
 export function createObservations(comparisons: AbilityComparison[]): Observation[] {
-  return comparisons
-    .map(createObservation)
-    .sort((left, right) => {
-      const severityDifference = severityOrder[left.severity] - severityOrder[right.severity];
-      return severityDifference || (left.comparisonKey ?? `${left.abilityID}:total`).localeCompare(right.comparisonKey ?? `${right.abilityID}:total`);
-    });
+  return comparisons.map(createObservation).sort((left, right) => {
+    const severityDifference = severityOrder[left.severity] - severityOrder[right.severity];
+    return (
+      severityDifference ||
+      (left.comparisonKey ?? `${left.abilityID}:total`).localeCompare(
+        right.comparisonKey ?? `${right.abilityID}:total`,
+      )
+    );
+  });
 }

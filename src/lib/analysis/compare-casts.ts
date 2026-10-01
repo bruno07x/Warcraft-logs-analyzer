@@ -30,7 +30,8 @@ export function compareCasts(
       const playerCast = playerByKey.get(comparisonKey);
       const referenceOneCast = referenceOneByKey.get(comparisonKey);
       const referenceTwoCast = referenceTwoByKey.get(comparisonKey);
-      const abilityID = playerCast?.abilityID ?? referenceOneCast?.abilityID ?? referenceTwoCast?.abilityID ?? 0;
+      const abilityID =
+        playerCast?.abilityID ?? referenceOneCast?.abilityID ?? referenceTwoCast?.abilityID ?? 0;
       const playerCasts = playerCast?.count ?? 0;
       const referenceOneCasts = referenceOneCast?.count ?? 0;
       const referenceTwoCasts = referenceTwoCast?.count ?? 0;
@@ -39,8 +40,16 @@ export function compareCasts(
       return {
         comparisonKey,
         abilityID,
-        abilityName: playerCast?.abilityName ?? referenceOneCast?.abilityName ?? referenceTwoCast?.abilityName ?? `Habilidade ${abilityID}`,
-        targetCategory: playerCast?.targetCategory ?? referenceOneCast?.targetCategory ?? referenceTwoCast?.targetCategory ?? "total",
+        abilityName:
+          playerCast?.abilityName ??
+          referenceOneCast?.abilityName ??
+          referenceTwoCast?.abilityName ??
+          `Habilidade ${abilityID}`,
+        targetCategory:
+          playerCast?.targetCategory ??
+          referenceOneCast?.targetCategory ??
+          referenceTwoCast?.targetCategory ??
+          "total",
         playerCasts,
         referenceOneCasts,
         referenceTwoCasts,
@@ -48,6 +57,15 @@ export function compareCasts(
         difference: playerCasts - referenceAverage,
       };
     })
-    .filter((comparison) => comparison.referenceOneCasts >= MINIMUM_REFERENCE_CASTS && comparison.referenceTwoCasts >= MINIMUM_REFERENCE_CASTS)
-    .sort((left, right) => right.referenceAverage - left.referenceAverage || left.abilityName.localeCompare(right.abilityName, "pt-BR") || left.abilityID - right.abilityID);
+    .filter(
+      (comparison) =>
+        comparison.referenceOneCasts >= MINIMUM_REFERENCE_CASTS &&
+        comparison.referenceTwoCasts >= MINIMUM_REFERENCE_CASTS,
+    )
+    .sort(
+      (left, right) =>
+        right.referenceAverage - left.referenceAverage ||
+        left.abilityName.localeCompare(right.abilityName, "pt-BR") ||
+        left.abilityID - right.abilityID,
+    );
 }

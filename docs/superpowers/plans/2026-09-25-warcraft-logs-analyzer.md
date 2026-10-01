@@ -38,24 +38,25 @@
 
 ## Mapa de arquivos
 
-| Arquivos | Responsabilidade |
-|---|---|
-| `package.json`, `pnpm-lock.yaml`, `tsconfig.json`, `next-env.d.ts`, `next.config.ts`, `eslint.config.mjs`, `.gitignore` | Ferramentas e configuração |
-| `src/app/layout.tsx`, `src/app/globals.css`, `src/app/page.tsx` | Estrutura e entrada |
-| `src/components/log-form.tsx` | Três campos, validação e navegação |
-| `src/types/analysis.ts` | Contratos internos compartilhados |
-| `src/lib/validation/log-url.ts`, `src/lib/validation/analysis-input.ts` | Parsing puro e validação dos três logs |
-| `src/lib/warcraft-logs/auth.ts`, `client.ts`, `schemas.ts`, `queries.ts`, `report.ts` | OAuth, transporte, validação externa e adaptação |
-| `src/lib/analysis/count-casts.ts`, `compare-casts.ts`, `observations.ts`, `analyze-logs.ts` | Contagem, comparação, regras e orquestração |
-| `src/app/analysis/page.tsx`, `loading.tsx`, `error.tsx` | Resultado e estados de navegação |
-| `src/components/analysis-results.tsx`, `log-summary.tsx` | Filtros, tabela e metadados |
-| `.env.example`, `README.md`, `docs/manual-verification.md`, `docs/progress.md` | Configuração, estudo, verificação e retomada |
+| Arquivos                                                                                                                | Responsabilidade                                 |
+| ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| `package.json`, `pnpm-lock.yaml`, `tsconfig.json`, `next-env.d.ts`, `next.config.ts`, `eslint.config.mjs`, `.gitignore` | Ferramentas e configuração                       |
+| `src/app/layout.tsx`, `src/app/globals.css`, `src/app/page.tsx`                                                         | Estrutura e entrada                              |
+| `src/components/log-form.tsx`                                                                                           | Três campos, validação e navegação               |
+| `src/types/analysis.ts`                                                                                                 | Contratos internos compartilhados                |
+| `src/lib/validation/log-url.ts`, `src/lib/validation/analysis-input.ts`                                                 | Parsing puro e validação dos três logs           |
+| `src/lib/warcraft-logs/auth.ts`, `client.ts`, `schemas.ts`, `queries.ts`, `report.ts`                                   | OAuth, transporte, validação externa e adaptação |
+| `src/lib/analysis/count-casts.ts`, `compare-casts.ts`, `observations.ts`, `analyze-logs.ts`                             | Contagem, comparação, regras e orquestração      |
+| `src/app/analysis/page.tsx`, `loading.tsx`, `error.tsx`                                                                 | Resultado e estados de navegação                 |
+| `src/components/analysis-results.tsx`, `log-summary.tsx`                                                                | Filtros, tabela e metadados                      |
+| `.env.example`, `README.md`, `docs/manual-verification.md`, `docs/progress.md`                                          | Configuração, estudo, verificação e retomada     |
 
 ## Tarefa 1 — Base Next.js e entrada validada (primeiro incremento)
 
 **Arquivos:** configurações, layout, CSS, página inicial, formulário, tipos, módulos de validação, página inicial de `/analysis` e documentação do mapa acima.
 
 **Interfaces:**
+
 - `LogReference = { reportCode: string; fightID: number; sourceID: number }`.
 - `LogSlot = 'player' | 'referenceOne' | 'referenceTwo'`; `LogInputs = Record<LogSlot, string>`.
 - `Result<T> = { ok: true; value: T } | { ok: false; error: AnalysisError }`.
@@ -76,6 +77,7 @@
 **Arquivos:** `src/lib/warcraft-logs/*`, `.env.example`, tipos, README e roteiro manual.
 
 **Interfaces:**
+
 - `getAccessToken(): Promise<string>`; `queryWarcraftLogs<T>(query: string, variables: Record<string, unknown>, decode: (value: unknown) => T): Promise<T>`; funções internas podem lançar erros conhecidos, convertidos na fronteira de `fetchLog`.
 - `CastEvent = { type: string; sourceID: number; abilityID: number }`.
 - `LogMetadata = { reportCode: string; fightID: number; sourceID: number; encounterID: number; encounterName: string; characterName: string; className?: string; specialization?: string; difficulty?: string; kill?: boolean; durationMs: number }`.
@@ -95,6 +97,7 @@
 **Arquivos:** tipos, `count-casts.ts`, `compare-casts.ts`, roteiro manual.
 
 **Interfaces:**
+
 - `CastCount` e `AbilityComparison` com os campos e fórmulas exatos da especificação.
 - `countCasts(events: CastEvent[], sourceID: number, abilityNames: Record<number, string>): CastCount[]`.
 - `compareCasts(player: CastCount[], referenceOne: CastCount[], referenceTwo: CastCount[]): AbilityComparison[]`.
@@ -109,6 +112,7 @@
 **Arquivos:** tipos, `observations.ts`, `analyze-logs.ts`, roteiro manual.
 
 **Interfaces:**
+
 - `Observation = { abilityID: number; severity: 'critical' | 'warning' | 'positive' | 'neutral'; message: string }`.
 - `AnalysisResult = { logs: Record<LogSlot, LogMetadata>; comparisons: AbilityComparison[]; observations: Observation[] }`.
 - `createObservations(comparisons: AbilityComparison[]): Observation[]`.
