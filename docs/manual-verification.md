@@ -56,17 +56,17 @@ Estes cenários exigem `WARCRAFT_LOGS_CLIENT_ID` e `WARCRAFT_LOGS_CLIENT_SECRET`
 
 Use dados descartáveis no domínio, sem chamar a API:
 
-| Cenário                | Resultado esperado                                                                                 |
-| ---------------------- | -------------------------------------------------------------------------------------------------- |
-| Casts concluídos       | Dois eventos `cast` do ator `10` para a habilidade `100` resultam em contagem `2`                  |
-| Evento iniciado        | Um `begincast` não entra na contagem                                                               |
-| Outro ator ou pet      | Evento com `sourceID` diferente não entra na contagem                                              |
-| Nome ausente           | Habilidade `999` ausente do mapa recebe `Habilidade 999`                                           |
-| Média fracionária      | Jogador `2`, referências `3` e `4` resulta em média `3,5` e diferença `-1,5`                       |
-| Habilidade elegível    | Jogador `0`, referências `5` e `7` entra na tabela, com média `6` e diferença `-6`                 |
-| Limiar das referências | Habilidade com menos de cinco casts em qualquer referência não entra na tabela nem nas observações |
-| Ordem da tabela        | Médias `11`, `10` e `8` aparecem nessa ordem decrescente; empates usam nome e identificador        |
-| Listas vazias          | Três listas vazias produzem uma comparação vazia                                                   |
+| Cenário                | Resultado esperado                                                                                |
+| ---------------------- | ------------------------------------------------------------------------------------------------- |
+| Casts concluídos       | Dois eventos `cast` do ator `10` para a habilidade `100` resultam em contagem `2`                 |
+| Evento iniciado        | Um `begincast` não entra na contagem                                                              |
+| Outro ator ou pet      | Evento com `sourceID` diferente não entra na contagem                                             |
+| Nome ausente           | Habilidade `999` ausente do mapa recebe `Habilidade 999`                                          |
+| Média fracionária      | Jogador `2`, referências `3` e `4` resulta em média `3,5` e diferença `-1,5`                      |
+| Habilidade elegível    | Jogador `0`, referências `5` e `7` entra na tabela, com média `6` e diferença `-6`                |
+| Limiar das referências | Habilidade com menos de três casts em qualquer referência não entra na tabela nem nas observações |
+| Ordem da tabela        | Médias `11`, `10` e `8` aparecem nessa ordem decrescente; empates usam nome e identificador       |
+| Listas vazias          | Três listas vazias produzem uma comparação vazia                                                  |
 
 Não aplicar normalização por duração, casts por minuto, decisões de rotação ou atribuição de pets neste incremento.
 
@@ -74,7 +74,7 @@ Não aplicar normalização por duração, casts por minuto, decisões de rotaç
 
 | Cenário                   | Resultado esperado                                                                                      |
 | ------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Ausência do jogador       | Zero casts do jogador e ao menos cinco casts em cada referência gera `critical`                         |
+| Ausência do jogador       | Zero casts do jogador e ao menos três casts em cada referência gera `critical`                          |
 | Abaixo da média           | Diferença negativa, sem ausência total, gera `warning` com valor fracionário quando aplicável           |
 | Acima da média            | Diferença positiva gera `positive`                                                                      |
 | Igualdade                 | Diferença zero gera `neutral`                                                                           |
@@ -85,10 +85,17 @@ Não aplicar normalização por duração, casts por minuto, decisões de rotaç
 | Metadados diferentes      | Classe, especialização, dificuldade e resultado diferentes continuam permitidos e preservados           |
 | Lista vazia confirmada    | Um log sem casts válidos gera contagens zero, sem ser tratado como erro                                 |
 
-## Incrementos posteriores — ainda indisponíveis
+## Incremento 5 — timelines de burst do Holy Paladin
 
-- Coordenação da interface para três relatórios e validação de encontros diferentes.
-- Casts concluídos do jogador, exclusão de pets, habilidade ausente e média fracionária.
-- Quatro severidades, busca por habilidade, filtro de neutros e resultado sem correspondências.
+Use um log público de Holy Paladin com a aba `healing` ou `damage-done`. Confirme a análise em uma tela larga e em uma largura móvel de 375px.
 
-Esses cenários serão detalhados e executados conforme as tarefas 2–5 forem implementadas; não são funcionalidades do primeiro incremento.
+| Cenário                      | Ação                                                                 | Resultado esperado                                                                                  |
+| ---------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Duas ativações               | Analisar uma luta em que o personagem castou Avenging Wrath 2+ vezes | “Burst 1” e “Burst 2” aparecem com jogador e duas referências                                       |
+| Gatilho                      | Conferir o primeiro cast de Avenging Wrath em cada coluna            | O gatilho aparece em `0,0s`                                                                         |
+| Ordem                        | Comparar os offsets das habilidades com a sequência do log           | Casts aparecem em ordem cronológica e alinhados pelo offset relativo ao próprio gatilho de cada log |
+| Fim exclusivo                | Conferir casts próximos ao limite da janela de 20 segundos           | Eventos em `20,0s` ou depois não entram; o início da janela é incluído                              |
+| Sem ativações                | Analisar uma luta Holy sem Avenging Wrath                            | As duas posições informam “Burst não ativado”; a análise agregada continua disponível               |
+| Uma ativação                 | Analisar uma luta com apenas um Avenging Wrath                       | Burst 1 mostra a sequência; Burst 2 informa “Burst não ativado”                                     |
+| Especialização não suportada | Analisar uma luta de outra especialização                            | A análise agregada aparece sem a seção “Timelines de burst”                                         |
+| Layout móvel                 | Abrir uma análise Holy a 375px                                       | Cada coluna empilha na ordem Você, Referência 1, Referência 2, sem overflow horizontal              |

@@ -78,6 +78,7 @@ export async function fetchLog(reference: LogReference): Promise<Result<FetchedL
         metadata: metadataPayload.metadata,
         casts,
         abilityNames: metadataPayload.abilityNames,
+        abilityIcons: metadataPayload.abilityIcons,
         friendlyActorIDs: metadataPayload.friendlyActorIDs,
       },
     };

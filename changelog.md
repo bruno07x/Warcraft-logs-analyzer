@@ -1,5 +1,10 @@
 # Changelog
 
+## Versão 3 — Ícones nas diferenças encontradas
+
+- Os cartões da seção “Diferenças encontradas” agora exibem o ícone da habilidade ao lado da observação correspondente.
+- Timelines mostram os dois primeiros bursts das espec. demonoloy, arcane, preservation e holy paladin, com casts alinhados por offset nos três logs.
+
 ## Versão 2 — Comparações equivalentes e casts por alvo
 
 - A seleção automática de referências agora respeita a métrica do log fornecido: HPS para cura e DPS para dano.

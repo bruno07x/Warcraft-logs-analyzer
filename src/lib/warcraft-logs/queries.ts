@@ -19,7 +19,7 @@ export const REPORT_METADATA_QUERY = `
         playerDetails(fightIDs: $fightIDs, includeCombatantInfo: true)
         masterData(translate: true) {
           actors { id name type subType petOwner }
-          abilities { gameID name }
+          abilities { gameID name icon }
         }
       }
     }

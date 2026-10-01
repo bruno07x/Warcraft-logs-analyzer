@@ -54,7 +54,6 @@ export async function findReferences(
       },
       page,
     );
-    console.warn("DEBUG:📝: candidatesResult=", candidatesResult);
     if (!candidatesResult.ok) return candidatesResult;
     hasMorePages = candidatesResult.value.hasMorePages;
     page += 1;
@@ -70,7 +69,6 @@ export async function findReferences(
       seen.add(key);
       const resolved = await resolveRankingReference(candidate);
       if (!resolved.ok) continue;
-      console.warn("DEBUG:📝: resolved=", resolved);
       if (
         resolved.value.reportCode === metadata.reportCode &&
         resolved.value.fightID === metadata.fightID &&

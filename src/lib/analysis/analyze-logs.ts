@@ -3,6 +3,7 @@ import type { AnalysisResult, FetchedLog, LogReference, LogSlot, Result } from "
 import { fetchLog } from "@/lib/warcraft-logs";
 import { compareCasts } from "./compare-casts";
 import { countCasts } from "./count-casts";
+import { buildBurstTimelines } from "./burst-timelines";
 import { createObservations } from "./observations";
 import { findReferences } from "./reference-selection";
 
@@ -42,7 +43,6 @@ export async function analyzeLogs(playerReference: LogReference): Promise<Result
   if (!playerResult.ok) return playerResult;
   const references = await findReferences(playerResult.value);
   if (!references.ok) return references;
-  console.warn("DEBUG:📝: references=", references);
   const logs = {
     player: playerResult.value,
     referenceOne: references.value.referenceOne.log,
@@ -68,6 +68,7 @@ export async function analyzeLogs(playerReference: LogReference): Promise<Result
     logs.referenceTwo.friendlyActorIDs,
   );
   const comparisons = compareCasts(playerCasts, referenceOneCasts, referenceTwoCasts);
+  const burstTimelines = buildBurstTimelines(logs);
 
   return {
     ok: true,
@@ -82,7 +83,13 @@ export async function analyzeLogs(playerReference: LogReference): Promise<Result
         referenceTwo: references.value.referenceTwo.percentile,
       },
       comparisons,
+      abilityIcons: {
+        ...logs.referenceTwo.abilityIcons,
+        ...logs.referenceOne.abilityIcons,
+        ...logs.player.abilityIcons,
+      },
       observations: createObservations(comparisons),
+      ...(burstTimelines ? { burstTimelines } : {}),
     },
   };
 }
